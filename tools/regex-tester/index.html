@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线正则表达式测试器 - 免费 Regex 测试工具 | 免费开发工具</title>
+    <meta name="description" content="免费在线正则表达式测试工具。支持 JavaScript/PCRE 语法，实时匹配高亮，捕获分组显示，替换功能。提供常用正则表达式速查表。程序员和数据处理人员的必备工具。">
+    <meta name="keywords" content="正则表达式测试器,regex tester,正则测试,正则匹配,正则替换,PCRE,在线正则工具,免费工具">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://it-tools.js.org/tools/regex-tester/">
+    <meta property="og:title" content="在线正则表达式测试器 - 免费 Regex 测试工具">
+    <meta property="og:description" content="免费在线正则表达式测试工具。支持实时匹配高亮、捕获分组、替换功能、常用正则速查表。">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="zh_CN">
+    <style>
+        :root {
+            --bg: #f0f2f5;
+            --bg-end: #d4d9e8;
+            --card-bg: #ffffff;
+            --text: #1a1a2e;
+            --text-secondary: #666;
+            --border: #e8ecf1;
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --primary-light: #7dd3fc;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --ad-bg: #f8f9fa;
+            --ad-border: #ddd;
+            --code-bg: #f5f5f5;
+            --highlight-bg: rgba(14, 165, 233, 0.25);
+            --highlight-border: rgba(14, 165, 233, 0.5);
+            --group1-bg: rgba(16, 185, 129, 0.2);
+            --group2-bg: rgba(245, 158, 11, 0.2);
+            --group3-bg: rgba(168, 85, 247, 0.2);
+        }
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --bg-end: #1e293b;
+            --card-bg: #1e293b;
+            --text: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --primary: #38bdf8;
+            --primary-dark: #0ea5e9;
+            --primary-light: #7dd3fc;
+            --success: #34d399;
+            --warning: #fbbf24;
+            --error: #f87171;
+            --ad-bg: #1e293b;
+            --ad-border: #475569;
+            --code-bg: #0f172a;
+            --highlight-bg: rgba(56, 189, 248, 0.2);
+            --highlight-border: rgba(56, 189, 248, 0.4);
+            --group1-bg: rgba(52, 211, 153, 0.15);
+            --group2-bg: rgba(251, 191, 36, 0.15);
+            --group3-bg: rgba(192, 132, 252, 0.15);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, var(--bg) 0%, var(--bg-end) 100%);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', 'Consolas', monospace;
+            line-height: 1.6;
+            transition: background 0.3s, color 0.3s;
+            min-height: 100vh;
+        }
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+        header {
+            background: linear-gradient(135deg, var(--primary), #6366f1);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+        }
+        header h1 { font-size: 28px; }
+        header p { font-size: 16px; opacity: 0.9; }
+
+        .theme-toggle {
+            position: fixed; top: 16px; right: 20px; z-index: 100;
+            background: rgba(255,255,255,0.2); border: none; color: white;
+            width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+            font-size: 20px; display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .tool-card {
+            background: var(--card-bg); border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            padding: 28px;
+            margin: -40px 0 30px; position: relative; z-index: 10;
+        }
+
+        .ad-placeholder {
+            background: var(--ad-bg); border: 2px dashed var(--border);
+            padding: 30px; text-align: center; border-radius: 8px;
+            margin: 20px 0; color: var(--text-secondary); font-size: 14px;
+        }
+        .ad-placeholder::before { content: "📢 "; }
+
+        .input-group { margin-bottom: 16px; }
+        .input-group label {
+            display: block; font-weight: 600; font-size: 14px;
+            margin-bottom: 6px; color: var(--text);
+        }
+        .input-group textarea, .input-group input {
+            width: 100%; padding: 10px 14px;
+            background: var(--code-bg); color: var(--text);
+            border: 1px solid var(--border); border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px; transition: border-color 0.2s;
+        }
+        .input-group textarea:focus, .input-group input:focus {
+            outline: none; border-color: var(--primary);
+        }
+        .input-group textarea { min-height: 100px; resize: vertical; }
+        .input-group input { height: 42px; }
+
+        .regex-row {
+            display: grid; grid-template-columns: 1fr auto 1fr;
+            gap: 12px; align-items: start;
+        }
+        .regex-pattern { position: relative; }
+        .regex-pattern input {
+            font-size: 15px; letter-spacing: 0.5px;
+        }
+
+        .flags-group {
+            display: flex; flex-wrap: wrap; gap: 6px; padding-top: 8px;
+        }
+        .flag-btn {
+            padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px;
+            background: var(--card-bg); color: var(--text); cursor: pointer;
+            font-size: 13px; font-family: 'Consolas', monospace;
+            font-weight: 600; transition: all 0.15s;
+        }
+        .flag-btn:hover { border-color: var(--primary); }
+        .flag-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .flag-btn .flag-desc {
+            font-weight: 400; font-size: 10px; opacity: 0.7;
+            display: block;
+        }
+
+        .action-bar { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
+        .action-bar button {
+            padding: 8px 18px; border: none; border-radius: 8px; cursor: pointer;
+            font-size: 14px; font-weight: 500; transition: all 0.2s;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-ghost { background: transparent; border: 1px solid var(--border) !important; color: var(--text); }
+        .btn-ghost:hover { background: var(--border); }
+
+        .mode-selector {
+            display: flex; border-radius: 10px; overflow: hidden;
+            border: 1px solid var(--border); margin-bottom: 16px;
+        }
+        .mode-btn {
+            flex: 1; padding: 10px 16px; border: none; cursor: pointer;
+            font-size: 14px; font-weight: 500; transition: all 0.2s;
+            background: var(--card-bg); color: var(--text-secondary);
+        }
+        .mode-btn.active { background: var(--primary); color: white; }
+        .mode-btn:not(:last-child) { border-right: 1px solid var(--border); }
+
+        .results-panel {
+            background: var(--code-bg); border: 1px solid var(--border);
+            border-radius: 8px; padding: 14px; margin-top: 12px;
+            min-height: 60px; max-height: 300px; overflow-y: auto;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px; line-height: 1.8; white-space: pre-wrap; word-break: break-all;
+        }
+
+        .match-summary {
+            display: flex; gap: 16px; flex-wrap: wrap; margin: 12px 0;
+            padding: 12px 16px; background: var(--code-bg); border-radius: 8px;
+            border: 1px solid var(--border); font-size: 13px;
+        }
+        .match-summary span { display: flex; align-items: center; gap: 4px; }
+        .match-summary .num { font-weight: 700; color: var(--primary); font-size: 16px; }
+
+        .groups-table {
+            width: 100%; border-collapse: collapse; margin-top: 12px;
+            font-size: 13px;
+        }
+        .groups-table th, .groups-table td {
+            padding: 8px 12px; border: 1px solid var(--border); text-align: left;
+        }
+        .groups-table th {
+            background: var(--primary); color: white; font-weight: 600;
+        }
+        .groups-table tr:nth-child(even) { background: var(--code-bg); }
+
+        .replace-area { margin-top: 16px; display: none; }
+        .replace-area.visible { display: block; }
+        .replace-area input {
+            width: 100%; padding: 10px 14px;
+            background: var(--code-bg); color: var(--text);
+            border: 1px solid var(--border); border-radius: 8px;
+            font-size: 14px; margin-bottom: 8px;
+        }
+        .replace-area input:focus { outline: none; border-color: var(--primary); }
+
+        .cheatsheet {
+            margin-top: 16px;
+        }
+        .cheatsheet summary {
+            cursor: pointer; font-weight: 600; color: var(--primary);
+            padding: 8px 0; font-size: 14px;
+        }
+        .cheatsheet-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 4px 20px;
+            padding: 8px 0; font-size: 13px;
+        }
+        .cheatsheet-item { display: flex; gap: 8px; align-items: baseline; }
+        .cheatsheet-item .pattern {
+            font-family: 'Consolas', monospace; background: var(--code-bg);
+            padding: 2px 8px; border-radius: 4px; color: var(--primary); font-weight: 600;
+            white-space: nowrap;
+        }
+        .cheatsheet-item .desc { color: var(--text-secondary); }
+
+        .status-bar {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 14px; background: var(--code-bg);
+            border-radius: 8px; margin-top: 10px; font-size: 13px;
+        }
+        .status-indicator { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .status-valid { background: var(--success); }
+        .status-invalid { background: var(--error); }
+        .status-idle { background: #9ca3af; }
+
+        .info-section {
+            background: var(--card-bg); border-radius: 16px; padding: 28px;
+            margin: 20px 0; border: 1px solid var(--border);
+        }
+        .info-section h3 { font-size: 18px; margin: 20px 0 10px; color: var(--text); }
+        .info-section h3:first-child { margin-top: 0; }
+        .info-section p { color: var(--text-secondary); line-height: 1.8; margin-bottom: 12px; }
+        .info-section ul { list-style: disc; padding-left: 20px; color: var(--text-secondary); line-height: 2; }
+        .info-section ul li a { color: var(--primary); text-decoration: none; }
+        .info-section ul li a:hover { text-decoration: underline; }
+
+        .tools-nav {
+            margin-top: 30px; padding: 24px;
+            background: var(--card-bg); border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        .tools-nav h3 { font-size: 1.1rem; margin-bottom: 14px; color: var(--text); }
+        .tools-nav a {
+            display: inline-block; margin: 4px 8px; padding: 8px 18px;
+            background: var(--primary); color: white; text-decoration: none;
+            border-radius: 8px; font-size: 14px; font-weight: 500;
+            transition: opacity 0.2s, transform 0.15s;
+        }
+        .tools-nav a:hover { opacity: 0.85; transform: translateY(-1px); }
+
+        .copy-toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px);
+            background: var(--text); color: var(--bg); padding: 10px 24px;
+            border-radius: 10px; font-size: 14px; opacity: 0;
+            transition: all 0.3s; pointer-events: none; z-index: 200;
+        }
+        .copy-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        @media (max-width: 600px) {
+            header h1 { font-size: 22px; }
+            .tool-card { padding: 18px; margin-top: -30px; }
+            .regex-row { grid-template-columns: 1fr; }
+            .action-bar { flex-direction: column; }
+            .action-bar button { width: 100%; justify-content: center; }
+            .cheatsheet-grid { grid-template-columns: 1fr; }
+            .match-summary { flex-direction: column; gap: 4px; }
+            .theme-toggle { top: 12px; right: 12px; width: 36px; height: 36px; font-size: 16px; }
+            .mode-selector { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle" aria-label="切换主题">🌙</button>
+
+<header>
+    <div class="container">
+        <h1>🔍 在线正则表达式测试器</h1>
+        <p>实时测试正则匹配 · 捕获分组 · 替换功能 · 速查表</p>
+    </div>
+</header>
+
+<div class="container">
+    <div class="ad-placeholder">广告位 - Google AdSense / Adsterra (预留)</div>
+
+    <div class="tool-card">
+        <div class="mode-selector">
+            <button class="mode-btn active" data-mode="match" onclick="switchMode('match')">🔎 匹配测试</button>
+            <button class="mode-btn" data-mode="replace" onclick="switchMode('replace')">🔄 替换模式</button>
+        </div>
+
+        <!-- Regex Pattern -->
+        <div class="input-group">
+            <label>📐 正则表达式</label>
+            <div class="regex-row">
+                <div class="regex-pattern">
+                    <div style="position:relative;">
+                        <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--primary);font-weight:700;font-size:16px;pointer-events:none;z-index:1;">/</span>
+                        <input type="text" id="patternInput" placeholder="输入正则表达式，例如：\d{3,4}[-.]\d{7,8}" style="padding-left:28px;" oninput="runTest()">
+                        <span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--primary);font-weight:700;font-size:16px;pointer-events:none;z-index:1;" id="patternSlash">/</span>
+                    </div>
+                </div>
+                <div class="flags-group" id="flagsGroup">
+                    <button class="flag-btn active" data-flag="g" onclick="toggleFlag(this)">g <span class="flag-desc">全局</span></button>
+                    <button class="flag-btn" data-flag="i" onclick="toggleFlag(this)">i <span class="flag-desc">忽略大小写</span></button>
+                    <button class="flag-btn" data-flag="m" onclick="toggleFlag(this)">m <span class="flag-desc">多行</span></button>
+                    <button class="flag-btn" data-flag="s" onclick="toggleFlag(this)">s <span class="flag-desc">点号匹配换行</span></button>
+                    <button class="flag-btn" data-flag="u" onclick="toggleFlag(this)">u <span class="flag-desc">Unicode</span></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Replace input (hidden in match mode) -->
+        <div class="replace-area" id="replaceArea">
+            <label>✏️ 替换为</label>
+            <input type="text" id="replaceInput" placeholder="输入替换文本，支持 $1, $2 等反向引用" oninput="runTest()">
+        </div>
+
+        <!-- Test Text -->
+        <div class="input-group">
+            <label>📄 测试文本</label>
+            <textarea id="testInput" placeholder="在此输入需要匹配的文本..." oninput="runTest()">联系电话：010-12345678 或 021-87654321
+邮箱地址：user@example.com 和 admin@test.org
+网址：https://www.example.com/path?q=search
+日期：2026-05-14, 2026/05/14, 05-14-2026
+IPv4: 192.168.1.1, 10.0.0.255</textarea>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="action-bar">
+            <button class="btn-primary" id="actionBtn">🔎 测试匹配</button>
+            <button class="btn-ghost" id="sampleBtn">📋 加载示例</button>
+            <button class="btn-ghost" id="clearBtn">🗑️ 清空</button>
+        </div>
+
+        <!-- Match Summary -->
+        <div class="match-summary" id="matchSummary">
+            <span>匹配结果: <span class="num" id="matchCount">0</span></span>
+            <span>耗时: <span class="num" id="matchTime">0</span>ms</span>
+            <span>测试文本长度: <span class="num" id="textLength">0</span> 字符</span>
+        </div>
+
+        <!-- Results Panel (matches highlighted in test text) -->
+        <div class="results-panel" id="resultsPanel">
+            <span style="color:var(--text-secondary)">输入正则表达式和测试文本后，匹配结果将高亮显示在此处...</span>
+        </div>
+
+        <!-- Groups Table -->
+        <div id="groupsContainer"></div>
+
+        <!-- Replace result -->
+        <div id="replaceResult" style="display:none;margin-top:12px;">
+            <label style="font-weight:600;font-size:14px;display:block;margin-bottom:6px;">✅ 替换结果</label>
+            <div class="results-panel" id="replaceResultPanel" style="max-height:200px;"></div>
+            <button class="btn-success" style="margin-top:8px;" onclick="copyReplaceResult()">📋 复制替换结果</button>
+        </div>
+
+        <div class="status-bar">
+            <span class="status-indicator status-idle" id="statusIndicator"></span>
+            <span id="statusText">就绪</span>
+        </div>
+
+        <!-- Cheatsheet -->
+        <details class="cheatsheet">
+            <summary>📖 常用正则表达式速查表</summary>
+            <div class="cheatsheet-grid">
+                <div class="cheatsheet-item"><span class="pattern">\d</span><span class="desc">数字字符 [0-9]</span></div>
+                <div class="cheatsheet-item"><span class="pattern">\w</span><span class="desc">单词字符 [a-zA-Z0-9_]</span></div>
+                <div class="cheatsheet-item"><span class="pattern">\s</span><span class="desc">空白字符（空格、制表符、换行）</span></div>
+                <div class="cheatsheet-item"><span class="pattern">\b</span><span class="desc">单词边界</span></div>
+                <div class="cheatsheet-item"><span class="pattern">.</span><span class="desc">匹配任意单个字符（除换行）</span></div>
+                <div class="cheatsheet-item"><span class="pattern">*</span><span class="desc">前一个字符出现 0 次或多次</span></div>
+                <div class="cheatsheet-item"><span class="pattern">+</span><span class="desc">前一个字符出现 1 次或多次</span></div>
+                <div class="cheatsheet-item"><span class="pattern">?</span><span class="desc">前一个字符出现 0 次或 1 次</span></div>
+                <div class="cheatsheet-item"><span class="pattern">{n,m}</span><span class="desc">前一个字符出现 n 到 m 次</span></div>
+                <div class="cheatsheet-item"><span class="pattern">[abc]</span><span class="desc">字符集：匹配 a、b 或 c</span></div>
+                <div class="cheatsheet-item"><span class="pattern">[^abc]</span><span class="desc">否定字符集：非 a、b、c</span></div>
+                <div class="cheatsheet-item"><span class="pattern">(abc)</span><span class="desc">捕获分组</span></div>
+                <div class="cheatsheet-item"><span class="pattern">(?:abc)</span><span class="desc">非捕获分组</span></div>
+                <div class="cheatsheet-item"><span class="pattern">(?=abc)</span><span class="desc">正向先行断言</span></div>
+                <div class="cheatsheet-item"><span class="pattern">(?!abc)</span><span class="desc">负向先行断言</span></div>
+                <div class="cheatsheet-item"><span class="pattern">^</span><span class="desc">字符串开头 / 行首（多行模式）</span></div>
+                <div class="cheatsheet-item"><span class="pattern">$</span><span class="desc">字符串结尾 / 行尾（多行模式）</span></div>
+                <div class="cheatsheet-item"><span class="pattern">\|</span><span class="desc">逻辑或（交替）</span></div>
+            </div>
+        </details>
+    </div>
+
+    <div class="ad-placeholder">广告位 - Google AdSense / Adsterra (预留)</div>
+
+    <div class="info-section">
+        <h3>💡 什么是正则表达式测试器？</h3>
+        <p>正则表达式测试器（Regex Tester）是一款帮助开发者和数据处理人员在线测试、调试正则表达式的交互工具。正则表达式（Regular Expression，简称 regex 或 regexp）是一种用于描述字符串匹配模式的强大工具，广泛应用于文本搜索、数据验证、字符串替换、日志分析等场景。</p>
+        <p>本工具支持完整的 JavaScript 正则表达式语法（兼容 PCRE 大部分特性），提供实时匹配高亮、捕获分组展示、替换功能、匹配统计等功能，帮助你快速验证和调试正则表达式。</p>
+
+        <h3>🔧 主要功能</h3>
+        <ul>
+            <li><strong>实时匹配</strong> — 输入即匹配，匹配结果高亮显示</li>
+            <li><strong>捕获分组</strong> — 自动识别并展示所有捕获组的结果</li>
+            <li><strong>替换模式</strong> — 支持 $1、$2 等反向引用进行字符串替换</li>
+            <li><strong>匹配统计</strong> — 匹配数量、耗时、文本长度实时统计</li>
+            <li><strong>正则速查表</strong> — 内置常用正则语法快速参考</li>
+            <li><strong>示例数据</strong> — 一键加载预置测试文本</li>
+                <li><a href="../diff-checker/">📋 文本对比</a></li>
+        </ul>
+
+        <h3>📋 常见使用场景</h3>
+        <ul>
+            <li><strong>Web 开发</strong> — 表单验证（邮箱、手机号、URL、IP 地址）</li>
+            <li><strong>数据处理</strong> — 日志解析、数据清洗、文本提取</li>
+            <li><strong>文本编辑器</strong> — 批量查找替换、代码重构</li>
+            <li><strong>爬虫开发</strong> — HTML 内容提取、URL 模式匹配</li>
+            <li><strong>安全检测</strong> — SQL 注入检测、XSS 过滤模式</li>
+        </ul>
+
+        <h3>🔗 更多免费在线工具</h3>
+        <ul>
+            <li><a href="../word-counter/">📝 在线字数统计工具</a> — 实时统计中英文字数、字符数、段落数</li>
+            <li><a href="../json-formatter/">🔧 JSON 格式化/校验工具</a> — 美化、验证、压缩 JSON</li>
+            <li><a href="../uuid-generator/">🔑 UUID/GUID 生成器</a> — 批量生成 UUID v4</li>
+            <li><a href="../base64-encoder/">🔄 Base64 编码解码器</a> — 文本和文件 Base64 编解码</li>
+            <li><a href="../password-generator/">🔐 密码生成器</a> — 批量生成强密码，强度检测</li>
+            <li><a href="../markdown-previewer/">📝 Markdown 预览器</a> — 在线 Markdown 编辑器实时预览</li>
+            <li><a href="../timestamp-converter/">⏰ 时间戳转换工具</a> — Unix 时间戳与日期互转</li>
+            <li><a href="../unit-converter/">📐 单位换算器</a> — 10大类单位互转</li>
+            <li><a href="../url-encoder/">🔗 URL 编码解码器</a> — URL Encode/Decode 互转</li>
+            <li><a href="../color-picker/">🎨 颜色选择器</a> — HEX/RGB/HSL/HSV/CMYK 颜色转换</li>
+        
+        <li><a href="../number-base-converter/">🔢 进制转换器</a> — 二进制/八进制/十进制/十六进制互转</li>
+    </ul>
+        <p style="color: var(--text-secondary); font-size: 13px; margin-top: 12px;">🔒 所有数据仅在本地浏览器中处理，不会上传到服务器</p>
+    </div>
+
+    <div class="ad-placeholder">广告位 - Google AdSense / Adsterra (预留)</div>
+
+    <div class="tools-nav">
+        <h3>🔧 更多免费在线工具</h3>
+        <a href="../word-counter/">在线字数统计</a>
+        <a href="../json-formatter/">JSON 格式化</a>
+        <a href="../uuid-generator/">UUID 生成器</a>
+        <a href="../base64-encoder/">Base64 编解码</a>
+        <a href="../password-generator/">密码生成器</a>
+        <a href="../markdown-previewer/">Markdown 预览器</a>
+        <a href="../timestamp-converter/">时间戳转换</a>
+        <a href="../unit-converter/">单位换算器</a>
+        <a href="../url-encoder/">URL 编码解码</a>
+        <a href="../color-picker/">颜色选择器</a>
+    </div>
+<a href="../number-base-converter/">进制转换器</a>
+            <a href="../diff-checker/">📋 文本对比</a></div>
+
+        <footer>
+    <p>© 2026 免费在线工具集 · 为开发者和数据处理人员提供实用工具 · 数据仅在本地处理</p>
+    <p style="margin-top:4px; font-size:12px;">
+        <a href="../word-counter/">字数统计</a> ·
+        <a href="../json-formatter/">JSON 格式化</a> ·
+        <a href="../uuid-generator/">UUID 生成器</a> ·
+        <a href="../base64-encoder/">Base64 编解码</a> ·
+        <a href="../password-generator/">密码生成器</a> ·
+        <a href="../markdown-previewer/">Markdown 预览器</a> ·
+        <a href="../timestamp-converter/">时间戳转换</a> ·
+        <a href="../unit-converter/">单位换算器</a> ·
+        <a href="../url-encoder/">URL 编码解码</a> ·
+        <a href="../color-picker/">颜色选择器</a>
+     · 
+            <a href="../number-base-converter/" style="color:var(--primary-light);text-decoration:none;">进制转换器</a>
+        </p>
+    </footer>
+
+<div class="copy-toast" id="copyToast">✅ 已复制到剪贴板</div>
+
+<script>
+(function() {
+    // ── DOM refs ──
+    const patternInput = document.getElementById('patternInput');
+    const testInput = document.getElementById('testInput');
+    const resultsPanel = document.getElementById('resultsPanel');
+    const matchCount = document.getElementById('matchCount');
+    const matchTime = document.getElementById('matchTime');
+    const textLength = document.getElementById('textLength');
+    const statusText = document.getElementById('statusText');
+    const statusIndicator = document.getElementById('statusIndicator');
+    const groupsContainer = document.getElementById('groupsContainer');
+    const replaceArea = document.getElementById('replaceArea');
+    const replaceInput = document.getElementById('replaceInput');
+    const replaceResult = document.getElementById('replaceResult');
+    const replaceResultPanel = document.getElementById('replaceResultPanel');
+    const copyToast = document.getElementById('copyToast');
+    const patternSlash = document.getElementById('patternSlash');
+
+    let currentMode = 'match';
+    let activeFlags = ['g'];
+
+    // ── Get flags string ──
+    function getFlags() {
+        return activeFlags.join('');
+    }
+
+    // ── Safely escape HTML ──
+    function escapeHtml(str) {
+        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    // ── Run regex test ──
+    function runTest() {
+        const pattern = patternInput.value;
+        const text = testInput.value;
+        textLength.textContent = text.length;
+
+        if (!pattern) {
+            resultsPanel.innerHTML = '<span style="color:var(--text-secondary)">请输入正则表达式...</span>';
+            matchCount.textContent = '0';
+            matchTime.textContent = '0';
+            groupsContainer.innerHTML = '';
+            replaceResult.style.display = 'none';
+            statusText.textContent = '就绪';
+            statusIndicator.className = 'status-indicator status-idle';
+            return;
+        }
+
+        try {
+            const flags = getFlags();
+            const regex = new RegExp(pattern, flags);
+            const startTime = performance.now();
+
+            // Find all matches
+            const allMatches = [];
+            let m;
+            while ((m = regex.exec(text)) !== null) {
+                allMatches.push({
+                    index: m.index,
+                    length: m[0].length,
+                    full: m[0],
+                    groups: m.slice(1)
+                });
+                if (!regex.global && !regex.sticky) break;
+                if (m.index === regex.lastIndex) regex.lastIndex++;
+            }
+
+            const elapsed = Math.round((performance.now() - startTime) * 100) / 100;
+
+            // Build highlighted text
+            let highlighted = '';
+            let lastIndex = 0;
+
+            if (allMatches.length === 0) {
+                highlighted = escapeHtml(text);
+            } else {
+                // Color map for groups
+                const groupColors = [
+                    'rgba(14,165,233,0.25)',    // blue
+                    'rgba(16,185,129,0.2)',     // green
+                    'rgba(245,158,11,0.2)',     // yellow
+                    'rgba(168,85,247,0.2)',     // purple
+                    'rgba(236,72,153,0.2)',     // pink
+                    'rgba(249,115,22,0.2)',     // orange
+                ];
+
+                // Sort matches by index to handle overlapping
+                const sorted = [...allMatches].sort((a, b) => a.index - b.index);
+
+                for (const match of sorted) {
+                    if (match.index > lastIndex) {
+                        highlighted += escapeHtml(text.substring(lastIndex, match.index));
+                    }
+                    // Don't re-highlight if this match overlaps with previous
+                    const overlapStart = Math.max(lastIndex, match.index);
+                    const matchEnd = match.index + match.length;
+                    if (overlapStart < matchEnd) {
+                        const colorIndex = sorted.indexOf(match) % groupColors.length;
+                        highlighted += '<span style="background:' + groupColors[colorIndex] + ';border-radius:3px;padding:0 2px;" title="匹配 #' + (sorted.indexOf(match)+1) + ': ' + escapeHtml(match.full) + '">' + escapeHtml(text.substring(Math.max(lastIndex, match.index), matchEnd)) + '</span>';
+                    }
+                    lastIndex = matchEnd;
+                }
+                if (lastIndex < text.length) {
+                    highlighted += escapeHtml(text.substring(lastIndex));
+                }
+            }
+
+            resultsPanel.innerHTML = highlighted;
+
+            // Update match count
+            matchCount.textContent = allMatches.length;
+            matchTime.textContent = elapsed;
+
+            // Build groups table
+            if (allMatches.length > 0 && allMatches.some(m => m.groups.length > 0)) {
+                let html = '<table class="groups-table"><tr><th>#</th><th>匹配全文</th><th>位置</th>';
+                const maxGroups = Math.max(...allMatches.map(m => m.groups.length));
+                for (let i = 1; i <= maxGroups; i++) {
+                    html += '<th>分组 ' + i + '</th>';
+                }
+                html += '</tr>';
+                allMatches.forEach((match, idx) => {
+                    html += '<tr><td>' + (idx + 1) + '</td><td>' + escapeHtml(match.full.slice(0, 80)) + '</td><td>' + match.index + '</td>';
+                    for (let i = 0; i < maxGroups; i++) {
+                        const g = match.groups[i];
+                        html += '<td>' + (g !== undefined ? escapeHtml(g.slice(0, 80)) : '<span style="color:var(--text-secondary)">—</span>') + '</td>';
+                    }
+                    html += '</tr>';
+                });
+                html += '</table>';
+                groupsContainer.innerHTML = html;
+            } else if (allMatches.length > 0) {
+                groupsContainer.innerHTML = '<p style="color:var(--text-secondary);font-size:13px;margin-top:8px;">没有捕获分组。使用 <code>(pattern)</code> 创建捕获组。</p>';
+            } else {
+                groupsContainer.innerHTML = '';
+            }
+
+            // Replace mode
+            if (currentMode === 'replace') {
+                const replaceStr = replaceInput.value;
+                const replaceRegex = new RegExp(pattern, flags);
+                const replaced = text.replace(replaceRegex, replaceStr);
+                replaceResultPanel.textContent = replaced;
+                replaceResult.style.display = 'block';
+            } else {
+                replaceResult.style.display = 'none';
+            }
+
+            statusText.textContent = '✅ 匹配完成 — ' + allMatches.length + ' 个结果';
+            statusIndicator.className = 'status-indicator status-valid';
+
+        } catch (e) {
+            resultsPanel.innerHTML = '<span style="color:var(--error)">❌ 正则表达式语法错误: ' + escapeHtml(e.message) + '</span>';
+            matchCount.textContent = '0';
+            groupsContainer.innerHTML = '';
+            replaceResult.style.display = 'none';
+            statusText.textContent = '⚠️ 语法错误: ' + e.message;
+            statusIndicator.className = 'status-indicator status-invalid';
+        }
+    }
+
+    window.runTest = runTest;
+
+    // ── Toggle Flags ──
+    window.toggleFlag = function(btn) {
+        const flag = btn.dataset.flag;
+        if (flag === 'g') {
+            // g is always active
+            return;
+        }
+        btn.classList.toggle('active');
+        activeFlags = [];
+        document.querySelectorAll('#flagsGroup .flag-btn.active').forEach(b => {
+            activeFlags.push(b.dataset.flag);
+        });
+        // Always keep g
+        if (!activeFlags.includes('g')) {
+            activeFlags.unshift('g');
+            document.querySelector('#flagsGroup .flag-btn[data-flag="g"]').classList.add('active');
+        }
+        runTest();
+    };
+
+    // ── Switch Mode ──
+    window.switchMode = function(mode) {
+        currentMode = mode;
+        document.querySelectorAll('.mode-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.mode === mode);
+        });
+        if (mode === 'replace') {
+            replaceArea.classList.add('visible');
+        } else {
+            replaceArea.classList.remove('visible');
+            replaceResult.style.display = 'none';
+        }
+        runTest();
+    };
+
+    // ── Copy replace result ──
+    window.copyReplaceResult = function() {
+        const text = replaceResultPanel.textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            copyToast.textContent = '✅ 替换结果已复制';
+            copyToast.classList.add('show');
+            setTimeout(() => copyToast.classList.remove('show'), 2000);
+        });
+    };
+
+    // ── Load sample ──
+    document.getElementById('sampleBtn').addEventListener('click', function() {
+        patternInput.value = '[\\w.-]+@[\\w.-]+\\.\\w{2,4}';
+        testInput.value = '联系电话：010-12345678 或 021-87654321\n邮箱地址：user@example.com 和 admin@test.org\n网址：https://www.example.com/path?q=search\n日期：2026-05-14, 2026/05/14, 05-14-2026\nIPv4: 192.168.1.1, 10.0.0.255';
+        runTest();
+    });
+
+    // ── Clear ──
+    document.getElementById('clearBtn').addEventListener('click', function() {
+        patternInput.value = '';
+        testInput.value = '';
+        runTest();
+    });
+
+    // ── Theme toggle ──
+    const themeToggle = document.getElementById('themeToggle');
+    function applyTheme(dark) {
+        if (dark) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            themeToggle.textContent = '☀️';
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            themeToggle.textContent = '🌙';
+        }
+        localStorage.setItem('theme', dark ? 'dark' : 'light');
+    }
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark') { applyTheme(true); }
+    else if (saved === 'light') { applyTheme(false); }
+    else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) { applyTheme(true); }
+    themeToggle.addEventListener('click', () => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        applyTheme(!isDark);
+    });
+
+    // ── Keyboard shortcut: Ctrl+Enter ──
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            e.preventDefault();
+            runTest();
+        }
+    });
+
+    // ── Init ──
+    runTest();
+})();
+</script>
+</body>
+</html>

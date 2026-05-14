@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>URL 编码解码工具 - 在线 URL Encode/Decode | 免费开发工具</title>
+<meta name="description" content="免费在线 URL 编码解码工具，支持 URL Encode 和 Decode 双向转换、自动检测编码、批量处理、实时转换。适用于开发调试、API 测试、参数编码等场景。">
+<meta name="keywords" content="URL编码,URL解码,URL Encode,URL Decode,Percent Encoding,百分号编码,在线编码工具,URL编码器,URL解码器,开发工具">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://heiimz.github.io/it-tools/tools/url-encoder/">
+<meta property="og:title" content="在线 URL 编码解码工具 - 支持批量处理与实时转换">
+<meta property="og:description" content="免费在线 URL 编码解码工具，支持 Encode/Decode 双向转换、自动检测、批量处理、实时转换，所有数据在本地浏览器处理。">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="zh_CN">
+<style>
+:root {
+    --bg: #f0f2f5;
+    --bg-end: #d4d9e8;
+    --card-bg: #ffffff;
+    --text: #1a1a2e;
+    --text-secondary: #666;
+    --border: #e8ecf1;
+    --shadow: 0 8px 30px rgba(0,0,0,0.08);
+    --primary: #0ea5e9;
+    --primary-dark: #0284c7;
+    --primary-light: #38bdf8;
+    --primary-hover: #0284c7;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --code-bg: #f8fafc;
+    --stat-bg: #f0f9ff;
+    --stat-bg-end: #e0f2fe;
+    --input-bg: #ffffff;
+    --input-border: #d1d5db;
+    --footer-bg: #1e293b;
+    --footer-text: #94a3b8;
+}
+[data-theme="dark"] {
+    --bg: #0f172a;
+    --bg-end: #1e293b;
+    --card-bg: #1e293b;
+    --text: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --border: #334155;
+    --shadow: 0 8px 30px rgba(0,0,0,0.3);
+    --primary: #38bdf8;
+    --primary-dark: #0ea5e9;
+    --primary-light: #7dd3fc;
+    --primary-hover: #0ea5e9;
+    --success: #34d399;
+    --warning: #fbbf24;
+    --danger: #f87171;
+    --code-bg: #0f172a;
+    --stat-bg: #0f172a;
+    --stat-bg-end: #1e1b4b;
+    --input-bg: #0f172a;
+    --input-border: #475569;
+    --footer-bg: #020617;
+    --footer-text: #64748b;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', sans-serif;
+    background: linear-gradient(135deg, var(--bg) 0%, var(--bg-end) 100%);
+    color: var(--text);
+    min-height: 100vh;
+    transition: background 0.3s, color 0.3s;
+}
+.container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+
+/* Header */
+header {
+    background: linear-gradient(135deg, #0ea5e9, #6366f1);
+    color: white;
+    padding: 40px 0 50px;
+    text-align: center;
+}
+header h1 { font-size: 28px; margin-bottom: 6px; }
+header p { font-size: 15px; opacity: 0.9; }
+
+/* Theme Toggle */
+.theme-toggle {
+    position: fixed; top: 16px; right: 20px; z-index: 100;
+    background: rgba(255,255,255,0.2); border: none; color: white;
+    width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+    font-size: 20px; display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(4px); transition: background 0.2s;
+}
+.theme-toggle:hover { background: rgba(255,255,255,0.3); }
+
+/* Mode Selector */
+.mode-selector {
+    display: flex; border-radius: 10px; overflow: hidden;
+    border: 1px solid var(--border); margin-bottom: 20px;
+}
+.mode-btn {
+    flex: 1; padding: 12px 16px; cursor: pointer; font-size: 14px; font-weight: 500;
+    border: none; background: var(--card-bg); color: var(--text-secondary);
+    transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.mode-btn:not(:last-child) { border-right: 1px solid var(--border); }
+.mode-btn:hover { background: var(--stat-bg); }
+.mode-btn.active { background: var(--primary); color: white; }
+
+/* Tool Card */
+.tool-card {
+    background: var(--card-bg); border-radius: 16px;
+    box-shadow: var(--shadow); padding: 28px;
+    margin: -30px 0 30px; position: relative; z-index: 10;
+    transition: background 0.3s;
+}
+
+/* Input/Output */
+textarea {
+    width: 100%; min-height: 180px; padding: 14px;
+    border: 1px solid var(--input-border); border-radius: 10px;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 14px; line-height: 1.6; resize: vertical;
+    background: var(--input-bg); color: var(--text);
+    transition: border-color 0.2s, background 0.3s, color 0.3s;
+}
+textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(14,165,233,0.1); }
+#outputArea {
+    background: var(--code-bg); min-height: 100px;
+    border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px; font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 14px; line-height: 1.6; word-break: break-all;
+    margin-top: 12px; cursor: pointer; transition: background 0.3s;
+}
+#outputArea:hover { background: var(--stat-bg); }
+
+/* Action Bar */
+.action-bar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+.action-bar button {
+    padding: 8px 18px; border: none; border-radius: 8px; cursor: pointer;
+    font-size: 14px; font-weight: 500; transition: all 0.2s;
+    display: flex; align-items: center; gap: 6px;
+}
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+.btn-success { background: var(--success); color: white; }
+.btn-success:hover { transform: translateY(-1px); }
+.btn-ghost { background: transparent; border: 1px solid var(--border) !important; color: var(--text); }
+.btn-ghost:hover { background: var(--stat-bg); }
+.btn-danger { background: var(--danger); color: white; }
+.btn-danger:hover { transform: translateY(-1px); }
+
+/* Options */
+.options-group {
+    display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;
+    padding: 14px; background: var(--stat-bg); border-radius: 10px;
+    align-items: center; font-size: 13px;
+}
+.options-group label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.options-group input[type="checkbox"] { accent-color: var(--primary); }
+
+/* Status Bar */
+.status-bar {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px; background: var(--code-bg);
+    border-radius: 8px; margin-top: 12px; font-size: 13px;
+}
+.status-indicator { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.status-valid { background: var(--success); }
+.status-invalid { background: var(--danger); }
+.status-idle { background: #9ca3af; }
+.status-bar .stats { margin-left: auto; font-size: 12px; color: var(--text-secondary); }
+
+/* Statistics row */
+.stat-row {
+    display: flex; gap: 24px; margin-top: 12px;
+    padding: 12px 14px; background: var(--stat-bg);
+    border-radius: 8px; font-size: 13px; flex-wrap: wrap;
+}
+.stat-row span { color: var(--text-secondary); }
+.stat-row strong { color: var(--primary); }
+
+/* Ad Placeholder */
+.ad-placeholder {
+    background: var(--card-bg); border: 2px dashed var(--border);
+    padding: 30px; text-align: center; border-radius: 12px;
+    margin: 20px 0; color: var(--text-secondary); font-size: 14px;
+}
+
+/* Info Section */
+.info-section {
+    background: var(--card-bg); border-radius: 16px;
+    padding: 24px; margin: 20px 0;
+    border: 1px solid var(--border);
+}
+.info-section h3 {
+    font-size: 18px; margin: 20px 0 10px;
+    color: var(--primary);
+}
+.info-section h3:first-child { margin-top: 0; }
+.info-section p { font-size: 14px; color: var(--text-secondary); line-height: 1.8; }
+.info-section ul { margin: 8px 0 0 20px; }
+.info-section ul li { font-size: 14px; color: var(--text-secondary); line-height: 1.8; }
+.info-section ul li a { color: var(--primary); text-decoration: none; }
+.info-section ul li a:hover { text-decoration: underline; }
+
+/* Tools Nav */
+.tools-nav {
+    margin-top: 30px; margin-bottom: 20px;
+    padding: 24px; background: var(--card-bg);
+    border-radius: 12px; border: 1px solid var(--border);
+}
+.tools-nav h3 { font-size: 18px; margin-bottom: 14px; color: var(--text); }
+.tools-nav a {
+    display: inline-block; margin: 4px 8px;
+    padding: 8px 18px; background: var(--primary);
+    color: white; text-decoration: none; border-radius: 8px;
+    font-size: 13px; font-weight: 500;
+    transition: opacity 0.2s, transform 0.15s;
+}
+.tools-nav a:hover { opacity: 0.85; transform: translateY(-1px); }
+
+/* Copy Toast */
+.copy-toast {
+    position: fixed; bottom: 30px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--text); color: var(--bg);
+    padding: 10px 24px; border-radius: 10px;
+    font-size: 14px; opacity: 0;
+    transition: all 0.3s; pointer-events: none; z-index: 200;
+}
+.copy-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Footer */
+footer {
+    background: var(--footer-bg);
+    color: var(--footer-text);
+    padding: 30px 0; margin-top: 40px; text-align: center; font-size: 13px;
+}
+footer a { color: var(--primary-light); text-decoration: none; margin: 0 6px; }
+footer a:hover { text-decoration: underline; }
+footer .sep { color: var(--border); margin: 0 4px; }
+
+/* Responsive */
+@media (max-width: 600px) {
+    header h1 { font-size: 22px; }
+    header { padding: 30px 0 40px; }
+    .tool-card { padding: 18px; margin-top: -20px; }
+    .action-bar { flex-direction: column; }
+    .action-bar button { width: 100%; justify-content: center; }
+    .mode-selector { flex-direction: column; border-radius: 10px; }
+    .mode-btn:not(:last-child) { border-right: none; border-bottom: 1px solid var(--border); }
+    .theme-toggle { top: 12px; right: 12px; width: 36px; height: 36px; font-size: 16px; }
+    .options-group { flex-direction: column; gap: 8px; }
+    .stat-row { flex-direction: column; gap: 6px; }
+}
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle" aria-label="切换主题">🌙</button>
+
+<header>
+    <div class="container">
+        <h1>🔗 URL 编码解码工具</h1>
+        <p>URL Encode / Decode — 支持自动检测、批量处理、实时转换</p>
+    </div>
+</header>
+
+<div class="container">
+    <!-- AD SLOT: top -->
+    <div class="ad-placeholder">广告位 - Google AdSense / 广告联盟 (预留)</div>
+
+    <!-- Tool Card -->
+    <div class="tool-card">
+        <!-- Mode Selector -->
+        <div class="mode-selector">
+            <button class="mode-btn active" data-mode="encode" onclick="switchMode('encode')">✏️ 编码 (Encode)</button>
+            <button class="mode-btn" data-mode="decode" onclick="switchMode('decode')">📖 解码 (Decode)</button>
+            <button class="mode-btn" data-mode="batch" onclick="switchMode('batch')">📋 批量处理</button>
+        </div>
+
+        <!-- Options -->
+        <div class="options-group" id="optionsGroup">
+            <label><input type="checkbox" id="encodeAllCheck" onchange="process()"> 编码所有字符 (包括字母数字)</label>
+            <label><input type="checkbox" id="plusSpaceCheck" onchange="process()"> 空格用 + 替代 %20</label>
+            <label><input type="checkbox" id="utf8Check" checked onchange="process()"> UTF-8 编码</label>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="action-bar">
+            <button class="btn-primary" id="actionBtn" onclick="process()">🔄 编码</button>
+            <button class="btn-success" id="copyBtn" onclick="copyResult()">📋 复制结果</button>
+            <button class="btn-ghost" id="sampleBtn" onclick="loadSample()">📋 加载示例</button>
+            <button class="btn-ghost" id="clearBtn" onclick="clearAll()">🗑️ 清空</button>
+            <button class="btn-ghost" id="swapBtn" onclick="swapMode()">🔄 互换模式</button>
+        </div>
+
+        <!-- Input -->
+        <textarea id="inputArea" placeholder="在此输入要编码的文本..."></textarea>
+
+        <!-- Output -->
+        <div id="outputArea" onclick="copyResult()">等待输入...</div>
+
+        <!-- Stat Row -->
+        <div class="stat-row">
+            <span>输入: <strong id="inputLen">0</strong> 字符</span>
+            <span>输出: <strong id="outputLen">0</strong> 字符</span>
+            <span>输入行数: <strong id="lineCount">0</strong></span>
+            <span>模式: <strong id="modeLabel">Encode</strong></span>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span class="status-indicator status-idle" id="statusIndicator"></span>
+            <span id="statusText">就绪 — 输入文本后自动转换</span>
+        </div>
+    </div>
+
+    <!-- AD SLOT: middle -->
+    <div class="ad-placeholder">广告位 - Google AdSense / 广告联盟 (预留)</div>
+
+    <!-- Info Section -->
+    <div class="info-section">
+        <h3>💡 什么是 URL 编码 (Percent Encoding)？</h3>
+        <p>URL 编码（又称百分号编码）是一种将 URL 中的特殊字符转换为 %XX 格式的编码方式。URL 中只允许使用 ASCII 字母、数字和一些特殊字符（-_.~），其他字符（如空格、中文、#、&、? 等）必须经过编码才能在 URL 中安全传输。</p>
+        <p>例如：空格 → <code>%20</code>（或 <code>+</code>），中文"你好"→ <code>%E4%BD%A0%E5%A5%BD</code></p>
+
+        <h3>🛠️ 功能特性</h3>
+        <p><strong>自动检测</strong> — 在 Decode 模式下自动检测输入是否为合法 URL 编码字符串</p>
+        <p><strong>批量处理</strong> — 支持每行一条 URL，批量编码/解码，结果逐行对应</p>
+        <p><strong>实时转换</strong> — 输入即转，无需点击按钮（支持 300ms 防抖自动处理）</p>
+        <p><strong>灵活选项</strong> — 编码所有字符、空格用 + 替代、UTF-8 编码切换</p>
+        <p><strong>隐私安全</strong> — 所有处理在浏览器本地完成，数据不上传服务器</p>
+
+        <h3>📋 常见编码对照表</h3>
+        <p><strong>空格</strong> → <code>%20</code> 或 <code>+</code></p>
+        <p><strong>#</strong> → <code>%23</code> — <strong>&</strong> → <code>%26</code> — <strong>?</strong> → <code>%3F</code></p>
+        <p><strong>=</strong> → <code>%3D</code> — <strong>/</strong> → <code>%2F</code> — <strong>:</strong> → <code>%3A</code></p>
+        <p><strong>@</strong> → <code>%40</code> — <strong>%</strong> → <code>%25</code> (编码本身)</p>
+
+        <h3>🔗 更多免费在线工具</h3>
+        <ul>
+            <li><a href="../word-counter/">📝 在线字数统计工具</a> — 实时统计中英文字数、字符数</li>
+            <li><a href="../json-formatter/">📋 JSON 格式化/校验工具</a> — 美化、验证、压缩 JSON</li>
+            <li><a href="../uuid-generator/">🆔 UUID/GUID 生成器</a> — 随机 UUID v4 批量生成</li>
+            <li><a href="../base64-encoder/">🔐 Base64 编码解码器</a> — Base64 编解码及文件转码</li>
+            <li><a href="../password-generator/">🔑 密码生成器</a> — 随机强密码批量生成，密码强度检测</li>
+            <li><a href="../markdown-previewer/">📝 Markdown 预览器</a> — 实时预览编辑</li>
+            <li><a href="../timestamp-converter/">⏰ 时间戳转换工具</a> — Unix 时间戳互转</li>
+            <li><a href="../unit-converter/">📐 单位换算器</a> — 10大类单位互转</li>
+        <li><a href="../color-picker/">🎨 颜色选择器</a> — 颜色转换与配色方案生成</li>
+            <li><a href="../regex-tester/">🔍 正则表达式测试器</a> — 实时测试正则匹配，分组展示，替换功能</li>
+        
+        <li><a href="../number-base-converter/">🔢 进制转换器</a> — 二进制/八进制/十进制/十六进制互转</li>
+                <li><a href="../diff-checker/">📋 文本对比</a></li>
+    </ul>
+    </div>
+
+    <!-- AD SLOT: bottom -->
+    <div class="ad-placeholder">广告位 - Google AdSense / 广告联盟 (预留)</div>
+
+    <!-- Cross-link Nav -->
+    <div class="tools-nav">
+        <h3>🔧 更多免费在线工具</h3>
+        <a href="../word-counter/">📝 字数统计</a>
+        <a href="../json-formatter/">📋 JSON 格式化</a>
+        <a href="../uuid-generator/">🆔 UUID 生成器</a>
+        <a href="../base64-encoder/">🔐 Base64 编解码</a>
+        <a href="../password-generator/">🔑 密码生成器</a>
+        <a href="../markdown-previewer/">📝 Markdown 预览</a>
+        <a href="../timestamp-converter/">⏰ 时间戳转换</a>
+        <a href="../unit-converter/">📐 单位换算器</a>
+        <a href="../color-picker/">🎨 颜色选择器</a>
+    </div>
+<a href="../number-base-converter/">进制转换器</a>
+            <a href="../diff-checker/">📋 文本对比</a></div>
+
+    <footer>
+    <p>© 2026 在线工具集 · 免费为开发者提供实用工具 · 所有数据仅在本地浏览器处理，不会上传到服务器</p>
+    <p style="margin-top:6px;">
+        <a href="../word-counter/">字数统计</a><span class="sep">·</span>
+        <a href="../json-formatter/">JSON 格式化</a><span class="sep">·</span>
+        <a href="../uuid-generator/">UUID 生成器</a><span class="sep">·</span>
+        <a href="../base64-encoder/">Base64 编解码</a><span class="sep">·</span>
+        <a href="../password-generator/">密码生成器</a><span class="sep">·</span>
+        <a href="../markdown-previewer/">Markdown 预览</a><span class="sep">·</span>
+        <a href="../timestamp-converter/">时间戳转换</a><span class="sep">·</span>
+        <a href="../unit-converter/">单位换算器</a><span class="sep">·</span>
+        <a href="../color-picker/">颜色选择器</a>
+    </p>
+</footer>
+
+<div class="copy-toast" id="copyToast">✅ 已复制到剪贴板</div>
+
+<script>
+(function() {
+    // ===== THEME TOGGLE =====
+    const themeToggle = document.getElementById('themeToggle');
+    function applyTheme(dark) {
+        if (dark) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            themeToggle.textContent = '☀️';
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            themeToggle.textContent = '🌙';
+        }
+        localStorage.setItem('theme', dark ? 'dark' : 'light');
+    }
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark') applyTheme(true);
+    else if (saved === 'light') applyTheme(false);
+    else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) applyTheme(true);
+    themeToggle.addEventListener('click', () => {
+        applyTheme(document.documentElement.getAttribute('data-theme') !== 'dark');
+    });
+
+    // ===== TOAST =====
+    const toast = document.getElementById('copyToast');
+    function showToast(msg) {
+        toast.textContent = msg;
+        toast.classList.add('show');
+        clearTimeout(toast._timer);
+        toast._timer = setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    // ===== DOM REFS =====
+    const inputArea = document.getElementById('inputArea');
+    const outputArea = document.getElementById('outputArea');
+    const actionBtn = document.getElementById('actionBtn');
+    const statusText = document.getElementById('statusText');
+    const statusIndicator = document.getElementById('statusIndicator');
+    const inputLen = document.getElementById('inputLen');
+    const outputLen = document.getElementById('outputLen');
+    const lineCount = document.getElementById('lineCount');
+    const modeLabel = document.getElementById('modeLabel');
+    const encodeAllCheck = document.getElementById('encodeAllCheck');
+    const plusSpaceCheck = document.getElementById('plusSpaceCheck');
+    const utf8Check = document.getElementById('utf8Check');
+
+    let currentMode = 'encode';
+
+    // ===== URL ENCODE/DECODE =====
+    function urlEncode(str) {
+        const encodeAll = encodeAllCheck.checked;
+        const usePlus = plusSpaceCheck.checked;
+        const useUTF8 = utf8Check.checked;
+
+        let encoded;
+        if (useUTF8) {
+            encoded = encodeURIComponent(str);
+            if (usePlus) encoded = encoded.replace(/%20/g, '+');
+            if (encodeAll) {
+                // Encode all non-reserved characters
+                encoded = encoded.replace(/[!'()*]/g, function(c) {
+                    return '%' + c.charCodeAt(0).toString(16).toUpperCase();
+                });
+            }
+        } else {
+            // Latin-1 encoding (ISO-8859-1)
+            encoded = '';
+            for (let i = 0; i < str.length; i++) {
+                const code = str.charCodeAt(i);
+                if (code <= 127) {
+                    const c = str[i];
+                    if (encodeAll || /[^a-zA-Z0-9\-_.~]/.test(c)) {
+                        encoded += '%' + code.toString(16).toUpperCase().padStart(2, '0');
+                    } else {
+                        encoded += c;
+                    }
+                } else {
+                    encoded += '%' + code.toString(16).toUpperCase();
+                }
+            }
+            if (usePlus) encoded = encoded.replace(/%20/g, '+');
+        }
+        return encoded;
+    }
+
+    function urlDecode(str) {
+        const usePlus = plusSpaceCheck.checked;
+        let processed = str;
+        if (usePlus) processed = processed.replace(/\+/g, ' ');
+
+        try {
+            return decodeURIComponent(processed.replace(/%25/g, '%25'));
+        } catch(e) {
+            try {
+                // Try with manual replacement
+                return decodeURIComponent(processed);
+            } catch(e2) {
+                // If decodeURIComponent fails, try manual approach
+                try {
+                    return decodeURIComponent(processed.replace(/%(?![0-9a-fA-F]{2})/g, '%25'));
+                } catch(e3) {
+                    return processed;
+                }
+            }
+        }
+    }
+
+    // ===== PROCESS =====
+    window.process = function() {
+        const input = inputArea.value;
+        updateStats(input);
+
+        if (!input.trim()) {
+            outputArea.textContent = '等待输入...';
+            statusIndicator.className = 'status-indicator status-idle';
+            statusText.textContent = '就绪 — 请在输入框中输入文本';
+            outputLen.textContent = '0';
+            return;
+        }
+
+        try {
+            let result;
+            if (currentMode === 'encode') {
+                result = urlEncode(input);
+            } else if (currentMode === 'decode') {
+                result = urlDecode(input);
+            } else {
+                // Batch mode: process line by line
+                const lines = input.split('\n');
+                result = lines.map(line => {
+                    if (line.trim() === '') return '';
+                    if (currentMode === 'batch-encode') {
+                        return urlEncode(line);
+                    } else {
+                        return urlDecode(line);
+                    }
+                }).join('\n');
+            }
+
+            outputArea.textContent = result;
+            outputLen.textContent = result.length;
+            statusIndicator.className = 'status-indicator status-valid';
+            statusText.textContent = currentMode === 'encode' ? '✅ 编码完成' : '✅ 解码完成';
+        } catch (e) {
+            outputArea.textContent = '❌ 处理出错: ' + e.message;
+            statusIndicator.className = 'status-indicator status-invalid';
+            statusText.textContent = '❌ 出错: ' + e.message;
+        }
+    };
+
+    // ===== SWITCH MODE =====
+    window.switchMode = function(mode) {
+        currentMode = mode;
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.mode === mode);
+        });
+
+        // Update UI
+        let label, placeholder;
+        if (mode === 'encode') {
+            label = 'Encode';
+            placeholder = '在此输入要编码的文本...';
+            actionBtn.innerHTML = '🔄 编码';
+            document.getElementById('optionsGroup').style.display = 'flex';
+        } else if (mode === 'decode') {
+            label = 'Decode';
+            placeholder = '在此输入要解码的 URL 编码字符串...';
+            actionBtn.innerHTML = '📖 解码';
+            document.getElementById('optionsGroup').style.display = 'flex';
+        } else {
+            label = 'Batch';
+            placeholder = '每行输入一条 URL，批量处理...';
+            actionBtn.innerHTML = '📋 批量处理';
+            document.getElementById('optionsGroup').style.display = 'flex';
+        }
+        modeLabel.textContent = label;
+        inputArea.placeholder = placeholder;
+        process();
+    };
+
+    // ===== SWAP MODE (swap between encode/decode) =====
+    window.swapMode = function() {
+        if (currentMode === 'encode') switchMode('decode');
+        else if (currentMode === 'decode') switchMode('encode');
+        // Swap input/output content
+        const tmp = inputArea.value;
+        inputArea.value = outputArea.textContent !== '等待输入...' ? outputArea.textContent : tmp;
+        process();
+    };
+
+    // ===== COPY =====
+    window.copyResult = function() {
+        const text = outputArea.textContent;
+        if (!text || text === '等待输入...') return;
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('✅ 已复制到剪贴板 (' + text.length + ' 字符)');
+        }).catch(() => {
+            showToast('⚠️ 复制失败，请手动选择文本');
+        });
+    };
+
+    // ===== SAMPLE / CLEAR =====
+    window.loadSample = function() {
+        if (currentMode === 'encode') {
+            inputArea.value = 'https://example.com/search?q=你好世界&lang=zh-CN&category=web 开发/测试#section';
+        } else {
+            inputArea.value = 'https%3A%2F%2Fexample.com%2Fsearch%3Fq%3D%E4%BD%A0%E5%A5%BD%26lang%3Dzh-CN%26category%3Dweb+%E5%BC%80%E5%8F%91';
+        }
+        process();
+    };
+
+    window.clearAll = function() {
+        inputArea.value = '';
+        outputArea.textContent = '等待输入...';
+        updateStats('');
+        statusIndicator.className = 'status-indicator status-idle';
+        statusText.textContent = '已清空';
+        outputLen.textContent = '0';
+    };
+
+    // ===== STATS =====
+    function updateStats(text) {
+        inputLen.textContent = text.length;
+        lineCount.textContent = text ? text.split('\n').length : 0;
+    }
+
+    // ===== DEBOUNCE AUTO-PROCESS =====
+    let debounceTimer;
+    inputArea.addEventListener('input', function() {
+        updateStats(this.value);
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(process, 300);
+    });
+
+    // ===== KEYBOARD SHORTCUT =====
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            e.preventDefault();
+            process();
+        }
+    });
+
+    // ===== INIT =====
+    switchMode('encode');
+})();
+</script>
+</body>
+</html>

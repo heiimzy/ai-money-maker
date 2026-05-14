@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>免费在线工具集 - 4个实用在线工具 | 无需注册 即开即用</title>
-    <meta name="description" content="免费在线工具集，包含字数统计、JSON格式化、UUID生成、Base64编解码等实用工具。所有工具无需注册，即开即用，数据仅在本地处理。">
-    <meta name="keywords" content="在线工具,免费工具,字数统计,JSON格式化,UUID生成器,Base64编解码,开发者工具">
-    <meta property="og:title" content="免费在线工具集 - 4个实用工具">
-    <meta property="og:description" content="免费在线工具，无需注册即开即用。字数统计、JSON格式化、UUID生成、Base64编解码。">
+    <title>免费在线工具集 - 13个实用在线工具 | 无需注册 即开即用</title>
+    <meta name="description" content="免费在线工具集，包含字数统计、JSON格式化、UUID生成、文本对比、Base64编解码、密码生成、Markdown预览、时间戳转换、单位换算器、URL编码解码器、颜色选择器、正则表达式测试器、进制转换器等实用工具。所有工具无需注册，即开即用，数据仅在本地处理。">
+    <meta name="keywords" content="在线工具,免费工具,字数统计,JSON格式化,UUID生成器,Base64编解码,密码生成器,Markdown预览器,时间戳转换,单位换算器,URL编码解码,颜色选择器,正则表达式测试器,进制转换器,文本对比,Diff Checker,开发者工具">
+    <meta property="og:title" content="免费在线工具集 - 13个实用工具">
+    <meta property="og:description" content="免费在线工具，无需注册即开即用。字数统计、JSON格式化、UUID生成、文本对比、Base64编解码、密码生成、Markdown预览、时间戳转换、单位换算器、URL编码解码器、颜色选择器、正则表达式测试器、进制转换器。">
     <meta property="og:type" content="website">
+    <link rel="canonical" href="https://heiimzy.github.io/it-tools/">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -30,12 +31,25 @@
             margin-bottom: 12px;
         }
         header p { color: #aaa; font-size: 1.1rem; }
-        
+
+        .category-section {
+            margin: 30px 0;
+        }
+        .category-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #888;
+            margin-bottom: 16px;
+            padding-left: 4px;
+            border-left: 3px solid #667eea;
+            padding-left: 12px;
+        }
+
         .tools-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 20px;
-            margin: 40px 0;
+            margin: 20px 0;
         }
         .tool-card {
             background: rgba(255,255,255,0.05);
@@ -67,6 +81,15 @@
             font-size: 0.85rem;
             color: #999;
             line-height: 1.5;
+        }
+        .tool-card .tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-top: 10px;
+            background: rgba(102, 126, 234, 0.2);
+            color: #a5b4fc;
         }
 
         .stats {
@@ -111,48 +134,127 @@
         @media (max-width: 600px) {
             header h1 { font-size: 1.6rem; }
             .stats { grid-template-columns: 1fr; }
+            .tools-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+            .tool-card { padding: 20px 16px; }
+            .tool-card .icon { font-size: 2rem; margin-bottom: 10px; }
+            .tool-card h3 { font-size: 0.95rem; }
+            .tool-card p { font-size: 0.78rem; }
         }
-    
-
-</style>
+    </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>🧰 免费在线工具集</h1>
-            <p>4 个实用工具 · 无需注册 · 即开即用 · 数据不上传服务器</p>
+            <p>13 个实用工具 · 无需注册 · 即开即用 · 数据不上传服务器</p>
         </header>
 
-        <div class="ad-placeholder">[ 广告位 - Google AdSense / 百度联盟 ]</div>
+        <div class="ad-placeholder">[ 广告位 - Google AdSense / 广告联盟 ]</div>
 
-        <div class="tools-grid">
-            <a class="tool-card" href="tools/word-counter/">
-                <div class="icon">📝</div>
-                <h3>字数统计工具</h3>
-                <p>实时统计中英文字数、字符数、单词数、行数、段落数</p>
-            </a>
-            <a class="tool-card" href="tools/json-formatter/">
-                <div class="icon">🔧</div>
-                <h3>JSON 格式化器</h3>
-                <p>美化、验证、压缩 JSON 数据，支持暗色主题</p>
-            </a>
-            <a class="tool-card" href="tools/uuid-generator/">
-                <div class="icon">🔑</div>
-                <h3>UUID 生成器</h3>
-                <p>批量生成 UUID v4，支持大小写和连字符格式切换</p>
-            </a>
-            <a class="tool-card" href="tools/base64-encoder/">
-                <div class="icon">🔄</div>
-                <h3>Base64 编解码器</h3>
-                <p>文本和文件的 Base64 编码/解码，支持 URL 安全模式</p>
-            </a>
+        <!-- Category: 文本工具 -->
+        <div class="category-section">
+            <div class="category-title">📝 文本工具</div>
+            <div class="tools-grid">
+                <a class="tool-card" href="tools/word-counter/">
+                    <div class="icon">📝</div>
+                    <h3>字数统计工具</h3>
+                    <p>实时统计中英文字数、字符数、单词数、行数、段落数</p>
+                </a>
+                <a class="tool-card" href="tools/markdown-previewer/">
+                    <div class="icon">📝</div>
+                    <h3>Markdown 预览器</h3>
+                    <p>在线 Markdown 编辑器，实时预览，支持表格、代码块、列表等</p>
+                </a>
+                <a class="tool-card" href="tools/diff-checker/">
+                    <div class="icon">📋</div>
+                    <h3>文本对比工具</h3>
+                    <p>比较两段文本差异，逐行高亮新增、删除和修改的内容</p>
+                    <span class="tag">新上线</span>
+                </a>
+            </div>
         </div>
 
-        
+        <!-- Category: 编码 / 开发工具 -->
+        <div class="category-section">
+            <div class="category-title">🔧 编码工具</div>
+            <div class="tools-grid">
+                <a class="tool-card" href="tools/json-formatter/">
+                    <div class="icon">🔧</div>
+                    <h3>JSON 格式化器</h3>
+                    <p>美化、验证、压缩 JSON 数据，支持暗色主题</p>
+                </a>
+                <a class="tool-card" href="tools/base64-encoder/">
+                    <div class="icon">🔄</div>
+                    <h3>Base64 编解码器</h3>
+                    <p>文本和文件的 Base64 编码/解码，支持 URL 安全模式</p>
+                </a>
+                <a class="tool-card" href="tools/url-encoder/">
+                    <div class="icon">🔗</div>
+                    <h3>URL 编码解码器</h3>
+                    <p>URL Encode/Decode 在线互转，支持批量处理、自动检测编码</p>
+                </a>
+            </div>
+        </div>
+
+        <!-- Category: 安全 / 生成工具 -->
+        <div class="category-section">
+            <div class="category-title">🔒 安全与生成工具</div>
+            <div class="tools-grid">
+                <a class="tool-card" href="tools/uuid-generator/">
+                    <div class="icon">🔑</div>
+                    <h3>UUID 生成器</h3>
+                    <p>批量生成 UUID v4，支持大小写和连字符格式切换</p>
+                </a>
+                <a class="tool-card" href="tools/password-generator/">
+                    <div class="icon">🔐</div>
+                    <h3>密码生成器</h3>
+                    <p>批量生成强密码，支持自定义长度和字符类型，密码强度检测</p>
+                </a>
+                <a class="tool-card" href="tools/color-picker/">
+                    <div class="icon">🎨</div>
+                    <h3>颜色选择器</h3>
+                    <p>HEX/RGB/HSL/HSV/CMYK 颜色互转，可视化取色器，配色方案生成</p>
+                </a>
+            </div>
+        </div>
+
+        <!-- Category: 转换 / 计算工具 -->
+        <div class="category-section">
+            <div class="category-title">📐 转换与计算工具</div>
+            <div class="tools-grid">
+                <a class="tool-card" href="tools/timestamp-converter/">
+                    <div class="icon">⏰</div>
+                    <h3>时间戳转换工具</h3>
+                    <p>Unix 时间戳与日期时间互转，支持秒级/毫秒级自动检测</p>
+                </a>
+                <a class="tool-card" href="tools/unit-converter/">
+                    <div class="icon">📐</div>
+                    <h3>单位换算器</h3>
+                    <p>10大类单位互转，支持长度、重量、温度、体积、面积、速度等</p>
+                </a>
+                <a class="tool-card" href="tools/number-base-converter/">
+                    <div class="icon">🔢</div>
+                    <h3>进制转换器</h3>
+                    <p>二进制/八进制/十进制/十六进制及自定义进制互转，程序员必备工具</p>
+                </a>
+            </div>
+        </div>
+
+        <!-- Category: 测试工具 -->
+        <div class="category-section">
+            <div class="category-title">🔍 测试工具</div>
+            <div class="tools-grid">
+                <a class="tool-card" href="tools/regex-tester/">
+                    <div class="icon">🔍</div>
+                    <h3>正则表达式测试器</h3>
+                    <p>实时测试正则匹配，捕获分组展示，支持替换功能，内置正则速查表</p>
+                </a>
+            </div>
+        </div>
 
         <div class="stats">
             <div class="stat-item">
-                <div class="num">4</div>
+                <div class="num">13</div>
                 <div class="label">在线工具</div>
             </div>
             <div class="stat-item">

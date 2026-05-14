@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>密码生成器 - 在线随机密码生成工具 | 强密码生成 | 免费工具</title>
+    <meta name="description" content="免费在线密码生成器，支持自定义长度、大小写字母、数字和特殊字符。批量生成强密码，密码强度检测，一键复制。保护您的账户安全，即开即用无需注册。">
+    <meta name="keywords" content="密码生成器,随机密码,强密码生成,在线密码工具,密码安全,密码强度检测,批量生成密码">
+    <meta property="og:title" content="密码生成器 - 在线随机强密码生成工具">
+    <meta property="og:description" content="免费在线密码生成器，支持自定义长度、大小写字母、数字和特殊字符。批量生成强密码，密码强度检测，一键复制。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://it-tools.js.org/tools/password-generator/">
+    <link rel="canonical" href="https://it-tools.js.org/tools/password-generator/">
+    <style>
+        :root {
+            --bg: #f5f7fa;
+            --card-bg: #ffffff;
+            --text: #1a1a2e;
+            --text-secondary: #666;
+            --border: #e0e0e0;
+            --input-bg: #f0f2f5;
+            --accent: #7c3aed;
+            --accent-hover: #6d28d9;
+            --accent-light: #ede9fe;
+            --success: #059669;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --shadow: 0 4px 24px rgba(0,0,0,0.08);
+            --radius: 12px;
+            --toggle-bg: #e0e0e0;
+        }
+        [data-theme="dark"] {
+            --bg: #0f0c29;
+            --card-bg: #1a1a2e;
+            --text: #e0e0e0;
+            --text-secondary: #999;
+            --border: #2a2a4a;
+            --input-bg: #16213e;
+            --accent: #a78bfa;
+            --accent-hover: #8b5cf6;
+            --accent-light: #2a1f5e;
+            --success: #34d399;
+            --warning: #fbbf24;
+            --danger: #f87171;
+            --shadow: 0 4px 24px rgba(0,0,0,0.3);
+            --toggle-bg: #333;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
+        }
+        .container { max-width: 780px; margin: 0 auto; padding: 20px; }
+        
+        /* Theme toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            background: var(--card-bg);
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+        }
+        .theme-toggle:hover { transform: scale(1.1); }
+
+        header {
+            text-align: center;
+            padding: 40px 0 32px;
+        }
+        header h1 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #7c3aed, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+        header p { color: var(--text-secondary); font-size: 1rem; }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 32px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        .ad-placeholder {
+            background: var(--input-bg);
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 30px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin: 20px 0;
+        }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        .form-group .desc { color: var(--text-secondary); font-size: 0.85rem; margin-top: 4px; }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 500px) {
+            .options-grid { grid-template-columns: 1fr; }
+        }
+
+        .opt-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: var(--input-bg);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .opt-item:hover { opacity: 0.85; }
+        .opt-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+        .opt-item span { font-size: 0.9rem; user-select: none; }
+
+        .length-control {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .length-control input[type="range"] {
+            flex: 1;
+            accent-color: var(--accent);
+            height: 6px;
+        }
+        .length-control .length-value {
+            min-width: 48px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--accent);
+        }
+
+        .count-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .count-control input[type="number"] {
+            width: 80px;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--input-bg);
+            color: var(--text);
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            flex: 1;
+            justify-content: center;
+        }
+        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+        .btn-secondary {
+            background: var(--input-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover { background: var(--border); }
+        .btn-success {
+            background: var(--success);
+            color: #fff;
+        }
+        .btn-success:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* Password strength */
+        .strength-meter {
+            margin: 16px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .strength-bar {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--input-bg);
+            overflow: hidden;
+        }
+        .strength-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: all 0.3s;
+            width: 0%;
+        }
+        .strength-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            min-width: 48px;
+            text-align: right;
+        }
+
+        /* Password list */
+        .password-list {
+            margin-top: 16px;
+        }
+        .password-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: var(--input-bg);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            word-break: break-all;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .password-item:hover { background: var(--border); }
+        .password-item .copy-badge {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: var(--success);
+            color: #fff;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .password-item .copy-badge.show { opacity: 1; }
+        .password-item .copy-icon {
+            margin-left: auto;
+            opacity: 0.5;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+        .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+        .empty-state p { font-size: 0.95rem; }
+
+        /* Strength colors */
+        .strength-0 { color: var(--danger); }
+        .strength-1 { color: var(--danger); }
+        .strength-2 { color: var(--warning); }
+        .strength-3 { color: var(--accent); }
+        .strength-4 { color: var(--success); }
+
+        /* Tools nav */
+        .tools-nav {
+            margin: 32px 0;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+        .tools-nav h3 {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        .tools-nav .pill-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+        .tools-nav a {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            background: var(--accent-light);
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .tools-nav a:hover {
+            background: var(--accent);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .footer-section {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+        .footer-section .info-list {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+        .footer-section .info-list li a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+        .footer-section .info-list li a:hover { color: var(--accent); }
+        .footer-sep {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            justify-content: center;
+            margin-top: 8px;
+            font-size: 0.8rem;
+        }
+        .footer-sep a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+        .footer-sep a:hover { color: var(--accent); }
+        .footer-sep .sep { color: var(--border); margin: 0 4px; }
+
+        @media (max-width: 600px) {
+            header h1 { font-size: 1.5rem; }
+            .card { padding: 20px; }
+            .btn-row .btn { flex: 1; }
+        }
+
+        .badge-container {
+            margin: 16px 0;
+            padding: 10px 14px;
+            background: var(--accent-light);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--accent);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="themeToggle" title="切换主题">🌙</button>
+
+    <div class="container">
+        <header>
+            <h1>🔐 密码生成器</h1>
+            <p>生成强密码，保护您的在线账户安全</p>
+        </header>
+
+        <!-- Ad slot top -->
+        <div class="ad-placeholder">[ 广告位 - Google AdSense / 广告联盟 ]</div>
+
+        <div class="card">
+            <!-- Options -->
+            <div class="form-group">
+                <label>密码长度 <span style="font-weight:400;color:var(--text-secondary)">(8-128位)</span></label>
+                <div class="length-control">
+                    <input type="range" id="lengthSlider" min="8" max="128" value="16">
+                    <span class="length-value" id="lengthDisplay">16</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>字符类型</label>
+                <div class="options-grid">
+                    <label class="opt-item">
+                        <input type="checkbox" id="chkUpper" checked>
+                        <span>大写字母 (A-Z)</span>
+                    </label>
+                    <label class="opt-item">
+                        <input type="checkbox" id="chkLower" checked>
+                        <span>小写字母 (a-z)</span>
+                    </label>
+                    <label class="opt-item">
+                        <input type="checkbox" id="chkNumber" checked>
+                        <span>数字 (0-9)</span>
+                    </label>
+                    <label class="opt-item">
+                        <input type="checkbox" id="chkSymbol" checked>
+                        <span>特殊字符 (!@#$%^&amp;*)</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>生成数量 <span style="font-weight:400;color:var(--text-secondary)">(1-50个)</span></label>
+                <div class="count-control">
+                    <input type="number" id="countInput" value="5" min="1" max="50">
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-primary" id="generateBtn">🔄 生成密码</button>
+                <button class="btn btn-secondary" id="clearBtn">🗑️ 清空</button>
+                <button class="btn btn-success" id="copyAllBtn">📋 全部复制</button>
+            </div>
+
+            <!-- Strength meter -->
+            <div class="strength-meter" id="strengthMeter" style="display:none;">
+                <span style="font-size:0.85rem;font-weight:600;">密码强度:</span>
+                <div class="strength-bar">
+                    <div class="strength-fill" id="strengthFill"></div>
+                </div>
+                <span class="strength-label" id="strengthLabel">-</span>
+            </div>
+
+            <div class="badge-container" id="batchBadge" style="display:none;">
+                💡 点击任意密码即可复制
+            </div>
+
+            <!-- Password list -->
+            <div class="password-list" id="passwordList">
+                <div class="empty-state">
+                    <div class="icon">🔐</div>
+                    <p>点击「生成密码」开始</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ad slot middle -->
+        <div class="ad-placeholder">[ 广告位 - Google AdSense / 广告联盟 ]</div>
+
+        <!-- Tools navigation -->
+        <div class="tools-nav">
+            <h3>🔧 更多免费在线工具</h3>
+            <div class="pill-group">
+                <a href="../word-counter/">📝 字数统计</a>
+                <a href="../json-formatter/">🔧 JSON 格式化</a>
+                <a href="../uuid-generator/">🔑 UUID 生成器</a>
+                <a href="../base64-encoder/">🔄 Base64 编解码</a>
+                <a href="../timestamp-converter/">⏰ 时间戳转换</a>
+                <a href="../markdown-previewer/">📝 Markdown 预览器</a>
+                <a href="../unit-converter/">📐 单位换算器</a>
+                <a href="../url-encoder/">🔗 URL 编码解码</a>
+                <a href="../color-picker/">🎨 颜色选择器</a>
+            </div>
+            <div class="footer-section">
+                <ul class="info-list">
+                    <li><a href="../word-counter/">在线字数统计工具</a></li>
+                    <li><a href="../json-formatter/">JSON 格式化/校验工具</a></li>
+                    <li><a href="../uuid-generator/">UUID/GUID 批量生成器</a></li>
+                    <li><a href="../base64-encoder/">Base64 编码解码器</a></li>
+                    <li><a href="../markdown-previewer/">Markdown 在线预览器</a></li>
+                    <li><a href="../timestamp-converter/">时间戳转换工具</a></li>
+                    <li><a href="../unit-converter/">单位换算器</a></li>
+                    <li><a href="../url-encoder/">URL 编码解码器</a></li>
+                    <li><a href="../color-picker/">颜色选择器</a></li>
+                    <li><a href="../regex-tester/">正则表达式测试器</a></li>
+                    <li><a href="../regex-tester/">正则表达式测试器</a><li><a href="../number-base-converter/">🔢 进制转换器</a> — 二进制/八进制/十进制/十六进制互🔢 进制转换器</li>
+                    <li><a href="../regex-tester/">正则表达式测试器
+                </ul>
+                <div class="footer-sep">
+                    <a href="../word-counter/">字数统计</a><span class="sep">|</span>
+                    <a href="../json-formatter/">JSON格式化</a><span class="sep">|</span>
+                    <a href="../uuid-generator/">UUID生成器</a><span class="sep">|</span>
+                    <a href="../base64-encoder/">Base64编解码</a><span class="sep">|</span>
+                    <a href="../markdown-previewer/">Markdown预览器</a><span class="sep">|</span>
+                    <a href="../timestamp-converter/">时间戳转换</a><span class="sep">|</span>
+                    <a href="../unit-converter/">单位换算器</a><span class="sep">|</span>
+                    <a href="../url-encoder/">URL编码解码</a><span class="sep">|</span>
+                    <a href="../color-picker/">颜色选择器</a><span class="sep">|</span>
+                    <a href="../regex-tester/">正则表达式测试器</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ad slot bottom -->
+        <div class="ad-placeholder">[ 广告位 - Google AdSense / 广告联盟 ]
+            <a href="../diff-checker/">📋 文本对比</a></div>
+
+        <footer style="text-align:center;padding:20px 0;color:var(--text-secondary);font-size:13px;">
+            <p>密码生成器 v1.0 · 所有计算在浏览器本地完成，密码不会上传到服务器</p>
+            <p style="margin-top:6px"><a href="../../" style="color:var(--accent);text-decoration:none;">返回首页 - 免费在线工具集</a></p>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle
+        (function() {
+            const saved = localStorage.getItem('theme');
+            if (saved) document.documentElement.setAttribute('data-theme', saved);
+        })();
+
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
+        });
+        // Update toggle icon on load
+        (function() {
+            const theme = document.documentElement.getAttribute('data-theme');
+            themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+        })();
+
+        // DOM elements
+        const lengthSlider = document.getElementById('lengthSlider');
+        const lengthDisplay = document.getElementById('lengthDisplay');
+        const countInput = document.getElementById('countInput');
+        const chkUpper = document.getElementById('chkUpper');
+        const chkLower = document.getElementById('chkLower');
+        const chkNumber = document.getElementById('chkNumber');
+        const chkSymbol = document.getElementById('chkSymbol');
+        const generateBtn = document.getElementById('generateBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const copyAllBtn = document.getElementById('copyAllBtn');
+        const passwordList = document.getElementById('passwordList');
+        const strengthMeter = document.getElementById('strengthMeter');
+        const strengthFill = document.getElementById('strengthFill');
+        const strengthLabel = document.getElementById('strengthLabel');
+        const batchBadge = document.getElementById('batchBadge');
+
+        lengthSlider.addEventListener('input', () => {
+            lengthDisplay.textContent = lengthSlider.value;
+        });
+
+        // Ensure at least one charset is selected
+        function validateOptions() {
+            const any = chkUpper.checked || chkLower.checked || chkNumber.checked || chkSymbol.checked;
+            if (!any) {
+                chkLower.checked = true;
+            }
+        }
+        [chkUpper, chkLower, chkNumber, chkSymbol].forEach(cb => {
+            cb.addEventListener('change', validateOptions);
+        });
+
+        // Generate passwords
+        function generatePassword(length, useUpper, useLower, useNumber, useSymbol) {
+            let chars = '';
+            if (useUpper) chars += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            if (useLower) chars += 'abcdefghijklmnopqrstuvwxyz';
+            if (useNumber) chars += '0123456789';
+            if (useSymbol) chars += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+
+            if (chars.length === 0) return '';
+
+            // Use crypto.getRandomValues for cryptographic randomness
+            const array = new Uint32Array(length);
+            crypto.getRandomValues(array);
+
+            let password = '';
+            for (let i = 0; i < length; i++) {
+                password += chars[array[i] % chars.length];
+            }
+            return password;
+        }
+
+        function calculateStrength(pwd) {
+            let score = 0;
+            // Length score
+            if (pwd.length >= 8) score += 10;
+            if (pwd.length >= 12) score += 10;
+            if (pwd.length >= 16) score += 10;
+            if (pwd.length >= 24) score += 10;
+            if (pwd.length >= 32) score += 10;
+
+            // Character variety
+            if (/[a-z]/.test(pwd)) score += 10;
+            if (/[A-Z]/.test(pwd)) score += 10;
+            if (/[0-9]/.test(pwd)) score += 10;
+            if (/[^a-zA-Z0-9]/.test(pwd)) score += 10;
+
+            // Entropy bonus
+            const unique = new Set(pwd).size;
+            if (unique > pwd.length * 0.7) score += 10;
+            if (unique > pwd.length * 0.5) score += 5;
+
+            // Penalty for repetition
+            const repeats = (pwd.match(/(.)\1{2,}/g) || []).length;
+            score -= repeats * 5;
+
+            return Math.max(0, Math.min(100, score));
+        }
+
+        function getStrengthLevel(score) {
+            if (score < 25) return { label: '弱', color: '#dc2626', class: 'strength-0' };
+            if (score < 50) return { label: '中等', color: '#d97706', class: 'strength-1' };
+            if (score < 70) return { label: '良好', color: '#7c3aed', class: 'strength-2' };
+            if (score < 85) return { label: '强', color: '#059669', class: 'strength-3' };
+            return { label: '非常强', color: '#10b981', class: 'strength-4' };
+        }
+
+        let currentPasswords = [];
+
+        function renderPasswords(passwords) {
+            currentPasswords = passwords;
+            passwordList.innerHTML = '';
+
+            if (!passwords || passwords.length === 0) {
+                passwordList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">🔐</div>
+                        <p>点击「生成密码」开始</p>
+                    </div>
+                `;
+                strengthMeter.style.display = 'none';
+                batchBadge.style.display = 'none';
+                return;
+            }
+
+            // Show strength (first password)
+            const first = passwords[0];
+            const score = calculateStrength(first);
+            const level = getStrengthLevel(score);
+            strengthMeter.style.display = 'flex';
+            strengthFill.style.width = score + '%';
+            strengthFill.style.background = level.color;
+            strengthLabel.textContent = level.label;
+            strengthLabel.style.color = level.color;
+
+            batchBadge.style.display = 'block';
+
+            // Render each password
+            passwords.forEach((pwd, index) => {
+                const div = document.createElement('div');
+                div.className = 'password-item';
+                div.innerHTML = `
+                    <span>${index + 1}.</span>
+                    <span style="flex:1">${escapeHtml(pwd)}</span>
+                    <span class="copy-icon">📋</span>
+                    <span class="copy-badge">✅ 已复制</span>
+                `;
+                div.addEventListener('click', () => {
+                    copyToClipboard(pwd, div);
+                });
+                passwordList.appendChild(div);
+            });
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function copyToClipboard(text, element) {
+            navigator.clipboard.writeText(text).then(() => {
+                const badge = element.querySelector('.copy-badge');
+                if (badge) {
+                    badge.classList.add('show');
+                    setTimeout(() => badge.classList.remove('show'), 1500);
+                }
+            }).catch(() => {
+                // Fallback
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                const badge = element.querySelector('.copy-badge');
+                if (badge) {
+                    badge.classList.add('show');
+                    setTimeout(() => badge.classList.remove('show'), 1500);
+                }
+            });
+        }
+
+        function generate() {
+            validateOptions();
+            const length = parseInt(lengthSlider.value);
+            const count = Math.min(Math.max(parseInt(countInput.value) || 1, 1), 50);
+            const useUpper = chkUpper.checked;
+            const useLower = chkLower.checked;
+            const useNumber = chkNumber.checked;
+            const useSymbol = chkSymbol.checked;
+
+            const passwords = [];
+            for (let i = 0; i < count; i++) {
+                passwords.push(generatePassword(length, useUpper, useLower, useNumber, useSymbol));
+            }
+            renderPasswords(passwords);
+        }
+
+        // Ctrl+Enter shortcut
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                generate();
+            }
+        });
+
+        generateBtn.addEventListener('click', generate);
+        clearBtn.addEventListener('click', () => {
+            renderPasswords([]);
+        });
+
+        copyAllBtn.addEventListener('click', () => {
+            if (currentPasswords.length === 0) return;
+            const text = currentPasswords.join('\n');
+            navigator.clipboard.writeText(text).then(() => {
+                const original = copyAllBtn.textContent;
+                copyAllBtn.textContent = '✅ 已复制全部';
+                setTimeout(() => { copyAllBtn.textContent = original; }, 1500);
+            }).catch(() => {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                const original = copyAllBtn.textContent;
+                copyAllBtn.textContent = '✅ 已复制全部';
+                setTimeout(() => { copyAllBtn.textContent = original; }, 1500);
+            });
+        });
+
+        // Auto-generate on page load
+        generate();
+    </script>
+</body>
+</html>

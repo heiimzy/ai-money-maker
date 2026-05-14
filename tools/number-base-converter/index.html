@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线进制转换器 - 免费二进制/八进制/十进制/十六进制转换工具 | 免费开发工具</title>
+    <meta name="description" content="免费在线进制转换工具。支持二进制(BIN)、八进制(OCT)、十进制(DEC)、十六进制(HEX)及自定义进制(2-36位)之间的相互转换。程序员、学生和IT从业者的必备工具。">
+    <meta name="keywords" content="进制转换器,进制转换,二进制转换,十六进制转换,八进制转换,十进制转二进制,在线进制转换,免费工具,开发者工具">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://it-tools.js.org/tools/number-base-converter/">
+    <meta property="og:title" content="在线进制转换器 - 免费进制转换工具">
+    <meta property="og:description" content="支持二进制、八进制、十进制、十六进制及自定义进制之间相互转换的免费在线工具。">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="zh_CN">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "在线进制转换器",
+        "description": "免费在线进制转换工具，支持二进制、八进制、十进制、十六进制及自定义进制互转",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "All",
+        "browserRequirements": "Requires JavaScript"
+    }
+    </script>
+    <style>
+        :root {
+            --bg: #f0f2f5;
+            --bg-end: #d4d9e8;
+            --card-bg: #ffffff;
+            --text: #1a1a2e;
+            --text-secondary: #666;
+            --border: #e8ecf1;
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --primary-light: #7dd3fc;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --ad-bg: #f8f9fa;
+            --ad-border: #ddd;
+            --code-bg: #f5f5f5;
+            --result-bg-light: #f0fdf4;
+            --result-bg-dark: #052e16;
+        }
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --bg-end: #1e293b;
+            --card-bg: #1e293b;
+            --text: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --primary: #38bdf8;
+            --primary-dark: #0ea5e9;
+            --primary-light: #7dd3fc;
+            --success: #34d399;
+            --warning: #fbbf24;
+            --error: #f87171;
+            --ad-bg: #1e293b;
+            --ad-border: #475569;
+            --code-bg: #0f172a;
+            --result-bg-light: #052e16;
+            --result-bg-dark: #052e16;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, var(--bg) 0%, var(--bg-end) 100%);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', 'Consolas', monospace;
+            line-height: 1.6;
+            transition: background 0.3s, color 0.3s;
+            min-height: 100vh;
+        }
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+        header {
+            background: linear-gradient(135deg, var(--primary), #6366f1);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+        }
+        header h1 { font-size: 28px; }
+        header p { font-size: 16px; opacity: 0.9; }
+
+        .theme-toggle {
+            position: fixed; top: 16px; right: 20px; z-index: 100;
+            background: rgba(255,255,255,0.2); border: none; color: white;
+            width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+            font-size: 20px; display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .tool-card {
+            background: var(--card-bg); border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            padding: 28px;
+            margin: -40px 0 30px; position: relative; z-index: 10;
+        }
+
+        .ad-placeholder {
+            background: var(--ad-bg); border: 2px dashed var(--border);
+            padding: 30px; text-align: center; border-radius: 8px;
+            margin: 20px 0; color: var(--text-secondary); font-size: 14px;
+        }
+        .ad-placeholder::before { content: "📢 "; }
+
+        .input-section { margin-bottom: 24px; }
+        .input-section label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; }
+        .input-row { display: flex; gap: 12px; align-items: flex-start; }
+        .input-row textarea, .input-row input[type="text"] {
+            flex: 1;
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 18px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            background: var(--code-bg);
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.2s;
+            resize: vertical;
+            min-height: 56px;
+        }
+        .input-row input[type="text"]:focus {
+            border-color: var(--primary);
+        }
+
+        .base-select-group { display: flex; flex-direction: column; gap: 4px; min-width: 90px; }
+        .base-select-group select {
+            padding: 14px 10px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 15px;
+            background: var(--card-bg);
+            color: var(--text);
+            cursor: pointer;
+            outline: none;
+        }
+        .base-select-group select:focus { border-color: var(--primary); }
+        .base-quick-btns { display: flex; gap: 4px; }
+        .base-quick-btn {
+            flex: 1;
+            padding: 6px 4px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--ad-bg);
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .base-quick-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .base-quick-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .action-bar { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
+        .action-bar button {
+            padding: 8px 18px; border: none; border-radius: 8px; cursor: pointer;
+            font-size: 14px; font-weight: 500; transition: all 0.2s;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-ghost { background: transparent; border: 1px solid var(--border) !important; color: var(--text); }
+        .btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
+
+        .results-grid { display: grid; gap: 12px; }
+        .result-row {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 16px;
+            background: var(--code-bg);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            transition: border-color 0.2s;
+        }
+        .result-row:hover { border-color: var(--primary); }
+        .result-label {
+            min-width: 60px;
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--primary);
+            text-transform: uppercase;
+        }
+        .result-value {
+            flex: 1;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 16px;
+            word-break: break-all;
+            color: var(--text);
+        }
+        .result-copy-btn {
+            padding: 6px 14px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .result-copy-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .result-copy-btn.copied { background: var(--success); color: white; border-color: var(--success); }
+
+        .custom-base-row {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 16px;
+            background: var(--ad-bg);
+            border-radius: 10px;
+            border: 1px dashed var(--border);
+            margin-top: 8px;
+        }
+        .custom-base-row label { font-size: 13px; font-weight: 600; white-space: nowrap; }
+        .custom-base-row input[type="number"] {
+            width: 70px;
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            background: var(--card-bg);
+            color: var(--text);
+            outline: none;
+        }
+        .custom-base-row input[type="number"]:focus { border-color: var(--primary); }
+
+        .status-bar {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 14px; background: var(--code-bg);
+            border-radius: 8px; margin-top: 16px; font-size: 13px;
+        }
+        .status-indicator { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .status-valid { background: #10b981; }
+        .status-invalid { background: #ef4444; }
+        .status-idle { background: #9ca3af; }
+
+        .info-section {
+            margin: 30px 0;
+            padding: 24px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        .info-section h3 { font-size: 18px; margin: 20px 0 10px; color: var(--text); }
+        .info-section h3:first-child { margin-top: 0; }
+        .info-section p { color: var(--text-secondary); line-height: 1.8; margin-bottom: 12px; }
+        .info-section ul { list-style: disc; padding-left: 20px; color: var(--text-secondary); line-height: 2; }
+        .info-section ul li a { color: var(--primary); text-decoration: none; }
+
+        .tools-nav {
+            margin-top: 30px;
+            padding: 24px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        .tools-nav h3 {
+            font-size: 1.1rem;
+            margin-bottom: 14px;
+            color: var(--text);
+        }
+        .tools-nav a {
+            display: inline-block;
+            margin: 4px 8px;
+            padding: 8px 18px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: opacity 0.2s, transform 0.15s;
+        }
+        .tools-nav a:hover { opacity: 0.85; transform: translateY(-1px); }
+
+        footer {
+            text-align: center;
+            padding: 24px 20px;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+        footer p { margin-bottom: 4px; }
+        footer a { color: var(--primary); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        .copy-toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px);
+            background: var(--text); color: var(--bg); padding: 10px 24px;
+            border-radius: 10px; font-size: 14px; opacity: 0;
+            transition: all 0.3s; pointer-events: none; z-index: 200;
+        }
+        .copy-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        .error-text { color: var(--error); font-size: 13px; margin-top: 6px; }
+
+        .char-count { font-size: 13px; color: var(--text-secondary); text-align: right; margin-top: 4px; }
+
+        @media (max-width: 600px) {
+            header h1 { font-size: 22px; }
+            .tool-card { padding: 18px; margin-top: -30px; }
+            .input-row { flex-direction: column; }
+            .base-select-group { flex-direction: row; min-width: auto; align-items: center; gap: 6px; }
+            .base-select-group select { flex: 1; padding: 12px; }
+            .result-row { flex-wrap: wrap; }
+            .result-label { min-width: 50px; }
+            .result-copy-btn { width: 100%; text-align: center; }
+            .action-bar { flex-direction: column; }
+            .action-bar button { width: 100%; justify-content: center; }
+            .theme-toggle { top: 12px; right: 12px; width: 36px; height: 36px; font-size: 16px; }
+            .custom-base-row { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle" aria-label="切换主题">🌙</button>
+
+<header>
+    <div class="container">
+        <h1>🔢 在线进制转换器</h1>
+        <p>二进制 / 八进制 / 十进制 / 十六进制 — 任意进制间互转</p>
+    </div>
+</header>
+
+<div class="container">
+    <div class="ad-placeholder">广告位 - Google AdSense / Adsterra (预留)</div>
+
+    <div class="tool-card">
+        <div class="input-section">
+            <label for="inputNumber">🔢 输入数字</label>
+            <div class="input-row">
+                <input type="text" id="inputNumber" placeholder="输入数字，如 FF、1010、255..." spellcheck="false" autocomplete="off" value="255">
+                <div class="base-select-group">
+                    <select id="inputBase">
+                        <option value="2">二进制 (BIN)</option>
+                        <option value="8">八进制 (OCT)</option>
+                        <option value="10" selected>十进制 (DEC)</option>
+                        <option value="16">十六进制 (HEX)</option>
+                        <option value="36">三十六进制</option>
+                    </select>
+                    <div class="base-quick-btns">
+                        <button class="base-quick-btn" data-base="2">BIN</button>
+                        <button class="base-quick-btn" data-base="8">OCT</button>
+                        <button class="base-quick-btn active" data-base="10">DEC</button>
+                        <button class="base-quick-btn" data-base="16">HEX</button>
+                    </div>
+                </div>
+            </div>
+            <div id="errorMsg" class="error-text"></div>
+        </div>
+
+        <div class="action-bar">
+            <button class="btn-primary" id="swapBtn">🔄 互换进制</button>
+            <button class="btn-ghost" id="clearBtn">🗑️ 清空</button>
+            <button class="btn-ghost" id="copyAllBtn">📋 复制全部</button>
+        </div>
+
+        <div class="results-grid" id="resultsGrid">
+            <div class="result-row">
+                <span class="result-label">BIN</span>
+                <span class="result-value" id="resultBin">11111111</span>
+                <button class="result-copy-btn" data-copy="resultBin">📋 复制</button>
+            </div>
+            <div class="result-row">
+                <span class="result-label">OCT</span>
+                <span class="result-value" id="resultOct">377</span>
+                <button class="result-copy-btn" data-copy="resultOct">📋 复制</button>
+            </div>
+            <div class="result-row">
+                <span class="result-label">DEC</span>
+                <span class="result-value" id="resultDec">255</span>
+                <button class="result-copy-btn" data-copy="resultDec">📋 复制</button>
+            </div>
+            <div class="result-row">
+                <span class="result-label">HEX</span>
+                <span class="result-value" id="resultHex">FF</span>
+                <button class="result-copy-btn" data-copy="resultHex">📋 复制</button>
+            </div>
+            <div class="custom-base-row">
+                <label for="customBase">🎯 自定义进制 (2-36)：</label>
+                <input type="number" id="customBase" value="3" min="2" max="36">
+                <span class="result-value" id="resultCustom" style="flex:1;font-family:monospace;">100110</span>
+                <button class="result-copy-btn" data-copy="resultCustom">📋 复制</button>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <span class="status-indicator status-valid" id="statusIndicator"></span>
+            <span id="statusText">就绪 — 255 DEC = FF HEX</span>
+        </div>
+    </div>
+
+    <div class="ad-placeholder">广告位 - Google AdSense / Adsterra (预留)</div>
+
+    <div class="info-section">
+        <h3>💡 什么是进制转换？</h3>
+        <p>进制转换（Base Conversion）是指将一个数字从一种进制表示转换为另一种进制表示的过程。计算机科学中最常见的进制包括：二进制（Base-2，每位只能是0或1）、八进制（Base-8，使用0-7）、十进制（Base-10，使用0-9，是人类日常使用的计数系统）、以及十六进制（Base-16，使用0-9和A-F）。理解不同进制之间的转换是编程、网络工程和数字电路设计的基础技能。</p>
+        <p>本工具支持基数 2 到 36 之间的任意进制转换。对于基数超过 10 的进制，字母 A-Z 用于表示 10-35 的数值。</p>
+
+        <h3>🔧 主要功能</h3>
+        <ul>
+            <li><strong>实时转换</strong> — 输入数字立即显示 BIN/OCT/DEC/HEX 四种常用进制结果</li>
+            <li><strong>自定义进制</strong> — 支持 2-36 任意基数之间的转换</li>
+            <li><strong>输入校验</strong> — 自动检查输入数字是否合法，如遇非法字符给出提示</li>
+            <li><strong>一键互换</strong> — 快速切换输入输出进制</li>
+            <li><strong>快速复制</strong> — 逐项复制或一键复制全部结果</li>
+            <li><strong>输入方式</strong> — 支持输入框直接输入和进制快速切换（BIN/OCT/DEC/HEX 按钮）</li>
+                <li><a href="../diff-checker/">📋 文本对比</a></li>
+        </ul>
+
+        <h3>📋 常见使用场景</h3>
+        <ul>
+            <li><strong>编程开发</strong> — 调试二进制协议、颜色值（#FF8800 到 RGB）、内存地址</li>
+            <li><strong>网络工程</strong> — IP 地址与子网掩码的二进制表示、MAC 地址转换</li>
+            <li><strong>计算机考试</strong> — 程序员等级考试、计算机组成原理中的数制转换练习</li>
+            <li><strong>嵌入式开发</strong> — 寄存器位操作、位掩码计算</li>
+            <li><strong>前端开发</strong> — CSS 颜色十六进制值到 RGB 转换，Unicode 编码查值</li>
+        </ul>
+
+        <h3>🔗 更多免费在线工具</h3>
+        <ul>
+            <li><a href="../word-counter/">📝 在线字数统计工具</a> — 实时统计中英文字数、字符数、段落数</li>
+            <li><a href="../json-formatter/">🔧 JSON 格式化/校验工具</a> — 美化、验证、压缩 JSON</li>
+            <li><a href="../uuid-generator/">🔑 UUID/GUID 生成器</a> — 批量生成 UUID v4</li>
+            <li><a href="../base64-encoder/">🔄 Base64 编码解码器</a> — 文本和文件 Base64 编解码</li>
+            <li><a href="../password-generator/">🔐 密码生成器</a> — 批量生成强密码，强度检测</li>
+            <li><a href="../markdown-previewer/">📝 Markdown 预览器</a> — 在线 Markdown 编辑器实时预览</li>
+            <li><a href="../timestamp-converter/">⏰ 时间戳转换工具</a> — Unix 时间戳与日期互转</li>
+            <li><a href="../unit-converter/">📐 单位换算器</a> — 10大类单位互转</li>
+            <li><a href="../url-encoder/">🔗 URL 编码解码器</a> — URL Encode/Decode 互转</li>
+            <li><a href="../color-picker/">🎨 颜色选择器</a> — HEX/RGB/HSL/HSV/CMYK 颜色转换</li>
+            <li><a href="../regex-tester/">🔍 正则表达式测试器</a> — 在线测试正则匹配与替换</li>
+        </ul>
+        <p style="color: var(--text-secondary); font-size: 13px; margin-top: 12px;">🔒 所有数据仅在本地浏览器中处理，不会上传到服务器</p>
+    </div>
+
+    <div class="ad-placeholder">广告位 - Google AdSense / Adsterra (预留)</div>
+
+    <div class="tools-nav">
+        <h3>🔧 更多免费在线工具</h3>
+        <a href="../word-counter/">在线字数统计</a>
+        <a href="../json-formatter/">JSON 格式化</a>
+        <a href="../uuid-generator/">UUID 生成器</a>
+        <a href="../base64-encoder/">Base64 编解码</a>
+        <a href="../password-generator/">密码生成器</a>
+        <a href="../markdown-previewer/">Markdown 预览器</a>
+        <a href="../timestamp-converter/">时间戳转换</a>
+        <a href="../unit-converter/">单位换算器</a>
+        <a href="../url-encoder/">URL 编码解码</a>
+        <a href="../color-picker/">颜色选择器</a>
+        <a href="../regex-tester/">正则表达式测试</a>
+    </div>
+            <a href="../diff-checker/">📋 文本对比</a></div>
+
+<footer>
+    <p>© 2026 免费在线工具集 · 为开发者和 IT 从业者提供实用工具 · 数据仅在本地处理</p>
+    <p style="margin-top:4px; font-size:12px;">
+        <a href="../word-counter/">字数统计</a> ·
+        <a href="../json-formatter/">JSON 格式化</a> ·
+        <a href="../uuid-generator/">UUID 生成器</a> ·
+        <a href="../base64-encoder/">Base64 编解码</a> ·
+        <a href="../password-generator/">密码生成器</a> ·
+        <a href="../markdown-previewer/">Markdown 预览器</a> ·
+        <a href="../timestamp-converter/">时间戳转换</a> ·
+        <a href="../unit-converter/">单位换算器</a> ·
+        <a href="../url-encoder/">URL 编码解码</a> ·
+        <a href="../color-picker/">颜色选择器</a> ·
+        <a href="../regex-tester/">正则表达式测试</a>
+    </p>
+</footer>
+
+<div class="copy-toast" id="copyToast">✅ 已复制到剪贴板</div>
+
+<script>
+(function() {
+    'use strict';
+
+    // ── DOM refs ──
+    const inputNumber = document.getElementById('inputNumber');
+    const inputBase = document.getElementById('inputBase');
+    const quickBtns = document.querySelectorAll('.base-quick-btn');
+    const errorMsg = document.getElementById('errorMsg');
+    const statusText = document.getElementById('statusText');
+    const statusIndicator = document.getElementById('statusIndicator');
+    const copyToast = document.getElementById('copyToast');
+
+    const resultEls = {
+        resultBin: document.getElementById('resultBin'),
+        resultOct: document.getElementById('resultOct'),
+        resultDec: document.getElementById('resultDec'),
+        resultHex: document.getElementById('resultHex'),
+        resultCustom: document.getElementById('resultCustom'),
+    };
+
+    const customBaseInput = document.getElementById('customBase');
+    const themeToggle = document.getElementById('themeToggle');
+    const swapBtn = document.getElementById('swapBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const copyAllBtn = document.getElementById('copyAllBtn');
+
+    // Standard base output mapping
+    const STANDARD_BASES = [
+        { key: 'resultBin',  base: 2,  label: 'BIN' },
+        { key: 'resultOct',  base: 8,  label: 'OCT' },
+        { key: 'resultDec',  base: 10, label: 'DEC' },
+        { key: 'resultHex',  base: 16, label: 'HEX' },
+    ];
+
+    // ── Theme ──
+    function applyTheme(dark) {
+        if (dark) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            themeToggle.textContent = '☀️';
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            themeToggle.textContent = '🌙';
+        }
+        localStorage.setItem('theme', dark ? 'dark' : 'light');
+    }
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark') {
+        applyTheme(true);
+    } else if (saved === 'light') {
+        applyTheme(false);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        applyTheme(true);
+    }
+    themeToggle.addEventListener('click', function() {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        applyTheme(!isDark);
+    });
+
+    // ── Copy toast ──
+    function showToast(msg) {
+        copyToast.textContent = msg;
+        copyToast.classList.add('show');
+        clearTimeout(copyToast._timer);
+        copyToast._timer = setTimeout(function() {
+            copyToast.classList.remove('show');
+        }, 2000);
+    }
+
+    // ── Core conversion ──
+    function convert() {
+        const rawVal = inputNumber.value.trim();
+        const fromBase = parseInt(inputBase.value, 10);
+
+        if (!rawVal) {
+            for (const key in resultEls) {
+                resultEls[key].textContent = '—';
+            }
+            statusText.textContent = '请输入数字';
+            statusIndicator.className = 'status-indicator status-idle';
+            errorMsg.textContent = '';
+            return;
+        }
+
+        // Validate input against the selected base
+        const upperVal = rawVal.toUpperCase();
+        const validChars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'.slice(0, fromBase);
+        for (let i = 0; i < upperVal.length; i++) {
+            if (!validChars.includes(upperVal[i])) {
+                errorMsg.textContent = '⚠️ 无效字符："' + rawVal[i] + '" 不是 ' + fromBase + ' 进制(' + validChars + ')的合法数字';
+                statusText.textContent = '输入错误';
+                statusIndicator.className = 'status-indicator status-invalid';
+                return;
+            }
+        }
+        errorMsg.textContent = '';
+
+        // Parse to decimal
+        let decimalValue;
+        try {
+            decimalValue = parseInt(upperVal, fromBase);
+            if (isNaN(decimalValue)) throw new Error('NaN');
+        } catch(e) {
+            errorMsg.textContent = '⚠️ 无法解析该数字，请检查输入';
+            statusText.textContent = '解析错误';
+            statusIndicator.className = 'status-indicator status-invalid';
+            return;
+        }
+
+        // Range check for very large numbers (precision limits)
+        if (!Number.isSafeInteger(decimalValue)) {
+            errorMsg.textContent = '⚠️ 数字超出安全整数范围（' + Number.MAX_SAFE_INTEGER + '），结果可能不精确';
+        } else {
+            errorMsg.textContent = '';
+        }
+
+        // Convert to standard bases
+        resultEls.resultBin.textContent  = decimalValue.toString(2).toUpperCase();
+        resultEls.resultOct.textContent  = decimalValue.toString(8).toUpperCase();
+        resultEls.resultDec.textContent  = decimalValue.toString(10);
+        resultEls.resultHex.textContent  = decimalValue.toString(16).toUpperCase();
+
+        // Custom base
+        const customBase = parseInt(customBaseInput.value, 10);
+        if (customBase >= 2 && customBase <= 36) {
+            resultEls.resultCustom.textContent = decimalValue.toString(customBase).toUpperCase();
+        } else {
+            resultEls.resultCustom.textContent = '基数需在 2-36';
+        }
+
+        // Build status text
+        const displayParts = STANDARD_BASES.map(function(b) {
+            return decimalValue.toString(b.base).toUpperCase() + ' ' + b.label;
+        });
+        statusText.textContent = '就绪 — ' + displayParts.join(' = ');
+        statusIndicator.className = 'status-indicator status-valid';
+    }
+
+    // ── Quick base buttons ──
+    quickBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const base = this.dataset.base;
+            inputBase.value = base;
+            quickBtns.forEach(function(b) { b.classList.remove('active'); });
+            this.classList.add('active');
+            convert();
+        });
+    });
+
+    // Sync quick buttons with select
+    inputBase.addEventListener('change', function() {
+        quickBtns.forEach(function(btn) {
+            btn.classList.toggle('active', btn.dataset.base === inputBase.value);
+        });
+        convert();
+    });
+
+    // ── Swap ──
+    swapBtn.addEventListener('click', function() {
+        const fromBase = parseInt(inputBase.value, 10);
+        const rawVal = inputNumber.value.trim();
+        if (!rawVal) return;
+
+        const upperVal = rawVal.toUpperCase();
+        let decimalValue;
+        try {
+            decimalValue = parseInt(upperVal, fromBase);
+            if (isNaN(decimalValue)) return;
+        } catch(e) { return; }
+
+        // Find the current output base with the most natural representation
+        // Try hex first, then dec, then oct, then bin
+        const hexStr = decimalValue.toString(16).toUpperCase();
+        if (/^[0-9A-F]+$/.test(hexStr) && hexStr.length > 0) {
+            // Set input to hex value, base 16
+            inputNumber.value = hexStr;
+            inputBase.value = '16';
+            quickBtns.forEach(function(b) { b.classList.toggle('active', b.dataset.base === '16'); });
+        } else {
+            inputNumber.value = decimalValue.toString(10);
+            inputBase.value = '10';
+            quickBtns.forEach(function(b) { b.classList.toggle('active', b.dataset.base === '10'); });
+        }
+        convert();
+    });
+
+    // ── Clear ──
+    clearBtn.addEventListener('click', function() {
+        inputNumber.value = '';
+        for (const key in resultEls) {
+            resultEls[key].textContent = '—';
+        }
+        statusText.textContent = '等待输入';
+        statusIndicator.className = 'status-indicator status-idle';
+        errorMsg.textContent = '';
+    });
+
+    // ── Copy individual result ──
+    document.querySelectorAll('.result-copy-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const targetId = this.dataset.copy;
+            const value = document.getElementById(targetId).textContent;
+            if (value === '—' || value.includes('基数需在')) return;
+
+            navigator.clipboard.writeText(value).then(function() {
+                const origText = btn.textContent;
+                btn.textContent = '✅ 已复制!';
+                btn.classList.add('copied');
+                setTimeout(function() {
+                    btn.textContent = origText;
+                    btn.classList.remove('copied');
+                }, 1500);
+                showToast('✅ 已复制: ' + value);
+            }).catch(function() {
+                showToast('⚠️ 复制失败');
+            });
+        });
+    });
+
+    // ── Copy all ──
+    copyAllBtn.addEventListener('click', function() {
+        const parts = [];
+        STANDARD_BASES.forEach(function(b) {
+            const val = resultEls[b.key].textContent;
+            if (val && val !== '—') {
+                parts.push(b.label + ': ' + val);
+            }
+        });
+        const customVal = resultEls.resultCustom.textContent;
+        if (customVal && customVal !== '—' && !customVal.includes('基数需在')) {
+            const customBase = customBaseInput.value;
+            parts.push('BASE-' + customBase + ': ' + customVal);
+        }
+        if (parts.length === 0) {
+            showToast('⚠️ 没有可复制的结果');
+            return;
+        }
+        navigator.clipboard.writeText(parts.join('\n')).then(function() {
+            showToast('✅ 已复制全部 (' + parts.length + ' 个进制)');
+        }).catch(function() {
+            showToast('⚠️ 复制失败');
+        });
+    });
+
+    // ── Custom base change ──
+    customBaseInput.addEventListener('change', convert);
+    customBaseInput.addEventListener('input', convert);
+
+    // ── Input events ──
+    inputNumber.addEventListener('input', convert);
+
+    // ── Keyboard shortcut: Ctrl+Enter ──
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            e.preventDefault();
+            convert();
+        }
+    });
+
+    // ── Init ──
+    convert();
+})();
+</script>
+</body>
+</html>

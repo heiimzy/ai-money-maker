@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线文本对比工具 - Diff Checker | 免费文本差异比较器</title>
+    <meta name="description" content="在线文本对比工具（Diff Checker），快速比较两段文本的差异。支持逐行对比、字符级别差异高亮、新增/删除/修改行彩色标记。免费使用，无需注册，数据仅在本地处理。">
+    <meta name="keywords" content="文本对比,Diff Checker,差异比较,文本差异,在线diff,代码对比,文本比较工具,文件对比,免费在线工具">
+    <meta property="og:title" content="在线文本对比工具 - Diff Checker | 免费文本差异比较器">
+    <meta property="og:description" content="免费在线文本对比工具，逐行比较文本差异，彩色高亮新增、删除和修改的行。无需注册，数据仅在本地处理。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://heiimzy.github.io/it-tools/tools/diff-checker/">
+    <link rel="canonical" href="https://heiimzy.github.io/it-tools/tools/diff-checker/">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f0c29;
+            --bg-secondary: #1a1840;
+            --bg-card: rgba(255,255,255,0.05);
+            --bg-card-hover: rgba(255,255,255,0.1);
+            --text-primary: #e4e4e7;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --border-color: rgba(255,255,255,0.1);
+            --accent-start: #10b981;
+            --accent-end: #059669;
+            --accent-gradient: linear-gradient(135deg, #10b981, #059669);
+            --diff-add-bg: rgba(16,185,129,0.15);
+            --diff-add-text: #6ee7b7;
+            --diff-del-bg: rgba(239,68,68,0.15);
+            --diff-del-text: #fca5a5;
+            --diff-mod-bg: rgba(251,191,36,0.15);
+            --diff-mod-text: #fde68a;
+            --diff-unchanged: #a1a1aa;
+            --line-num-bg: rgba(255,255,255,0.03);
+            --line-num-color: #52525b;
+            --textarea-bg: rgba(255,255,255,0.05);
+            --textarea-border: rgba(255,255,255,0.1);
+            --textarea-focus: #10b981;
+            --toolbar-bg: rgba(255,255,255,0.03);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #e2e8f0;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --accent-start: #059669;
+            --accent-end: #10b981;
+            --accent-gradient: linear-gradient(135deg, #059669, #10b981);
+            --diff-add-bg: rgba(16,185,129,0.1);
+            --diff-add-text: #059669;
+            --diff-del-bg: rgba(239,68,68,0.1);
+            --diff-del-text: #dc2626;
+            --diff-mod-bg: rgba(251,191,36,0.1);
+            --diff-mod-text: #d97706;
+            --diff-unchanged: #64748b;
+            --line-num-bg: #f1f5f9;
+            --line-num-color: #94a3b8;
+            --textarea-bg: #ffffff;
+            --textarea-border: #e2e8f0;
+            --textarea-focus: #059669;
+            --toolbar-bg: #f1f5f9;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.3rem;
+            color: var(--text-primary);
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            border-color: var(--accent-start);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 0 30px;
+        }
+        header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+        }
+        header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .ad-placeholder {
+            background: var(--bg-card);
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin: 20px 0;
+        }
+
+        .tool-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .diff-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .diff-header .label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .diff-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .diff-input-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .diff-input-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .diff-input-group label .badge {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+        .badge-add { background: rgba(16,185,129,0.2); color: var(--diff-add-text); }
+        .badge-del { background: rgba(239,68,68,0.2); color: var(--diff-del-text); }
+
+        .diff-input-group textarea {
+            flex: 1;
+            min-height: 220px;
+            background: var(--textarea-bg);
+            border: 1px solid var(--textarea-border);
+            border-radius: 10px;
+            padding: 14px;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+            resize: vertical;
+            transition: border-color 0.3s;
+            outline: none;
+        }
+        .diff-input-group textarea:focus {
+            border-color: var(--textarea-focus);
+            box-shadow: 0 0 0 3px rgba(16,185,129,0.1);
+        }
+        .diff-input-group textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .diff-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-primary {
+            background: var(--accent-gradient);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16,185,129,0.3);
+        }
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+        .btn-secondary:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+        }
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 0.8rem;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .diff-options {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 12px 16px;
+            background: var(--toolbar-bg);
+            border-radius: 10px;
+        }
+        .diff-options label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+        .diff-options input[type="checkbox"] {
+            accent-color: var(--accent-start);
+            width: 16px;
+            height: 16px;
+        }
+        .diff-options input[type="number"] {
+            width: 60px;
+            padding: 4px 8px;
+            background: var(--textarea-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        .diff-stats {
+            display: flex;
+            gap: 16px;
+            margin: 16px 0;
+            flex-wrap: wrap;
+        }
+        .diff-stat {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .diff-stat.add { background: var(--diff-add-bg); color: var(--diff-add-text); }
+        .diff-stat.del { background: var(--diff-del-bg); color: var(--diff-del-text); }
+        .diff-stat.mod { background: var(--diff-mod-bg); color: var(--diff-mod-text); }
+        .diff-stat.unchanged { background: var(--toolbar-bg); color: var(--diff-unchanged); }
+
+        .diff-result {
+            display: none;
+            margin-top: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .diff-result.visible { display: block; }
+        .diff-result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: var(--toolbar-bg);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .diff-result-view {
+            overflow-x: auto;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .diff-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.8rem;
+            line-height: 1.6;
+        }
+        .diff-table td {
+            padding: 2px 10px;
+            vertical-align: top;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .diff-table .line-num {
+            color: var(--line-num-color);
+            text-align: right;
+            padding: 2px 8px;
+            background: var(--line-num-bg);
+            width: 40px;
+            user-select: none;
+            border-right: 1px solid var(--border-color);
+            font-size: 0.75rem;
+        }
+        .diff-table .line-num-del { background: rgba(239,68,68,0.08); }
+        .diff-table .line-num-add { background: rgba(16,185,129,0.08); }
+
+        .diff-del { background: var(--diff-del-bg); }
+        .diff-add { background: var(--diff-add-bg); }
+        .diff-mod { background: var(--diff-mod-bg); }
+        .diff-eq { background: transparent; }
+
+        .diff-del .line-content { color: var(--diff-del-text); }
+        .diff-add .line-content { color: var(--diff-add-text); }
+        .diff-mod .line-content { color: var(--diff-mod-text); }
+        .diff-eq .line-content { color: var(--diff-unchanged); }
+
+        .diff-empty { color: var(--text-muted); text-align: center; padding: 40px; }
+
+        .char-diff {
+            padding: 1px 2px;
+            border-radius: 3px;
+        }
+        .char-diff.del { background: rgba(239,68,68,0.35); text-decoration: line-through; }
+        .char-diff.add { background: rgba(16,185,129,0.35); }
+
+        .btn-copy {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+        .btn-copy:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .tools-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin: 24px 0 16px;
+        }
+        .tools-nav a {
+            display: inline-block;
+            padding: 6px 16px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.82rem;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        .tools-nav a:hover {
+            background: rgba(16,185,129,0.15);
+            border-color: rgba(16,185,129,0.3);
+            color: var(--diff-add-text);
+            transform: translateY(-1px);
+        }
+        [data-theme="light"] .tools-nav a {
+            background: rgba(0,0,0,0.03);
+            border-color: var(--border-color);
+        }
+        [data-theme="light"] .tools-nav a:hover {
+            background: rgba(16,185,129,0.1);
+            border-color: rgba(16,185,129,0.3);
+        }
+
+        .info-section {
+            margin-top: 32px;
+            padding: 20px;
+            background: var(--toolbar-bg);
+            border-radius: 12px;
+        }
+        .info-section h3 {
+            font-size: 1rem;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+        .info-section ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .info-section ul li a {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+        .info-section ul li a:hover {
+            background: var(--bg-card-hover);
+            color: var(--accent-start);
+            border-color: var(--accent-start);
+        }
+
+        .footer-section {
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-color);
+        }
+        .footer-section .info-list {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+        .footer-section .info-list li a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: color 0.3s;
+            padding: 2px 4px;
+        }
+        .footer-section .info-list li a:hover {
+            color: var(--accent-start);
+        }
+        .footer-sep {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .footer-sep a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s;
+            padding: 2px 4px;
+        }
+        .footer-sep a:hover {
+            color: var(--accent-start);
+        }
+        .footer-sep .sep {
+            color: var(--border-color);
+            padding: 0 4px;
+        }
+        .copyright {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+        .copyright a {
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+        .copyright a:hover {
+            color: var(--accent-start);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px 24px;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            opacity: 0;
+            transition: all 0.4s;
+            z-index: 9999;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            pointer-events: none;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .diff-inputs {
+                grid-template-columns: 1fr;
+            }
+            .container { padding: 20px 12px; }
+            header h1 { font-size: 1.5rem; }
+            .tool-card { padding: 20px; }
+            .diff-input-group textarea { min-height: 150px; }
+            .tools-nav { gap: 6px; }
+            .tools-nav a { font-size: 0.75rem; padding: 4px 10px; }
+            .diff-stats { gap: 8px; }
+            .diff-stat { font-size: 0.78rem; padding: 6px 12px; }
+        }
+        @media (max-width: 600px) {
+            .diff-options { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .diff-actions { flex-direction: column; }
+            .diff-actions .btn { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()" title="切换主题" aria-label="Toggle theme">🌙</button>
+    <div class="container">
+        <header>
+            <h1>📋 文本对比工具</h1>
+            <p>快速比较两段文本的差异，逐行高亮新增、删除和修改的内容。代码对比、文章校对、版本比较的理想工具。</p>
+        </header>
+
+        <!-- Ad Slot 1: Top -->
+        <div class="ad-placeholder">[ 广告位 - Google AdSense / 广告联盟 ]</div>
+
+        <div class="tool-card">
+            <div class="diff-header">
+                <span class="label">输入两段文本进行对比</span>
+                <div>
+                    <button class="btn btn-secondary btn-sm" onclick="swapInputs()" title="交换两侧内容">🔄 交换</button>
+                    <button class="btn btn-secondary btn-sm" onclick="loadSample()" title="加载示例数据">📄 示例</button>
+                    <button class="btn btn-secondary btn-sm" onclick="clearAll()" title="清空所有">🗑️ 清空</button>
+                </div>
+            </div>
+
+            <div class="diff-inputs">
+                <div class="diff-input-group">
+                    <label><span>文本 A（原始）</span><span class="badge badge-del">删除</span></label>
+                    <textarea id="textA" placeholder="在此粘贴原始文本...&#10;&#10;例如：旧版本的代码、修改前的文章、原文"></textarea>
+                </div>
+                <div class="diff-input-group">
+                    <label><span>文本 B（修改后）</span><span class="badge badge-add">新增</span></label>
+                    <textarea id="textB" placeholder="在此粘贴修改后文本...&#10;&#10;例如：新版本的代码、修改后的文章、译文"></textarea>
+                </div>
+            </div>
+
+            <div class="diff-options">
+                <label><input type="checkbox" id="ignoreWhitespace"> 忽略空白差异</label>
+                <label><input type="checkbox" id="charLevel" checked> 字符级别高亮</label>
+                <label><input type="checkbox" id="caseSensitive" checked> 区分大小写</label>
+                <label>上下文行数: <input type="number" id="contextLines" value="3" min="0" max="10"></label>
+            </div>
+
+            <div class="diff-actions">
+                <button class="btn btn-primary" onclick="computeDiff()" id="compareBtn">🔍 比较差异</button>
+                <button class="btn btn-secondary" onclick="copyResult()" id="copyBtn">📋 复制结果</button>
+            </div>
+
+            <div id="diffStats" class="diff-stats"></div>
+
+            <div id="diffResult" class="diff-result">
+                <div class="diff-result-header">
+                    <span>差异对比结果</span>
+                    <button class="btn-copy" onclick="copyResult()" title="复制差异结果">📋 复制</button>
+                </div>
+                <div class="diff-result-view" id="diffOutput"></div>
+            </div>
+        </div>
+
+        <!-- Ad Slot 2: Middle -->
+        <div class="ad-placeholder">[ 广告位 - Google AdSense / 广告联盟 ]</div>
+
+        <div class="tools-nav">
+            <a href="../word-counter/">📊 字数统计</a>
+            <a href="../json-formatter/">🛠️ JSON格式化</a>
+            <a href="../uuid-generator/">🔑 UUID生成</a>
+            <a href="../base64-encoder/">🔐 Base64编码</a>
+            <a href="../password-generator/">🔒 密码生成</a>
+            <a href="../markdown-previewer/">📝 Markdown预览</a>
+            <a href="../timestamp-converter/">⏰ 时间戳转换</a>
+            <a href="../unit-converter/">📐 单位换算</a>
+            <a href="../url-encoder/">🔗 URL编码</a>
+            <a href="../color-picker/">🎨 颜色选择</a>
+            <a href="../regex-tester/">🔍 正则测试</a>
+            <a href="../number-base-converter/">🔢 进制转换</a>
+        </div>
+
+        <!-- Ad Slot 3: Bottom -->
+        <div class="ad-placeholder">[ 广告位 - Google AdSense / 广告联盟 ]</div>
+
+        <div class="info-section">
+            <h3>📌 全部工具</h3>
+            <ul>
+                <li><a href="../word-counter/">字数统计</a></li>
+                <li><a href="../json-formatter/">JSON格式化</a></li>
+                <li><a href="../uuid-generator/">UUID生成</a></li>
+                <li><a href="../base64-encoder/">Base64编码</a></li>
+                <li><a href="../password-generator/">密码生成</a></li>
+                <li><a href="../markdown-previewer/">Markdown预览</a></li>
+                <li><a href="../timestamp-converter/">时间戳转换</a></li>
+                <li><a href="../unit-converter/">单位换算</a></li>
+                <li><a href="../url-encoder/">URL编码</a></li>
+                <li><a href="../color-picker/">颜色选择</a></li>
+                <li><a href="../regex-tester/">正则测试</a></li>
+                <li><a href="../number-base-converter/">进制转换</a></li>
+            </ul>
+        </div>
+
+        <footer class="footer-section">
+            <div class="footer-sep">
+                <a href="../word-counter/">📊 字数统计</a><span class="sep">·</span>
+                <a href="../json-formatter/">🛠️ JSON格式化</a><span class="sep">·</span>
+                <a href="../uuid-generator/">🔑 UUID生成</a><span class="sep">·</span>
+                <a href="../base64-encoder/">🔐 Base64编码</a><span class="sep">·</span>
+                <a href="../password-generator/">🔒 密码生成</a><span class="sep">·</span>
+                <a href="../markdown-previewer/">📝 Markdown预览</a><span class="sep">·</span>
+                <a href="../timestamp-converter/">⏰ 时间戳转换</a><span class="sep">·</span>
+                <a href="../unit-converter/">📐 单位换算</a><span class="sep">·</span>
+                <a href="../url-encoder/">🔗 URL编码</a><span class="sep">·</span>
+                <a href="../color-picker/">🎨 颜色选择</a><span class="sep">·</span>
+                <a href="../regex-tester/">🔍 正则测试</a><span class="sep">·</span>
+                <a href="../number-base-converter/">🔢 进制转换</a>
+            </div>
+            <div class="copyright">
+                <a href="https://heiimzy.github.io/it-tools/">免费在线工具集</a> — 所有工具免费使用，数据仅在本地处理
+            </div>
+        </footer>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // ===== Theme =====
+        (function() {
+            const saved = localStorage.getItem('theme');
+            if (saved === 'light' || saved === 'dark') {
+                document.documentElement.setAttribute('data-theme', saved);
+            } else {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+            }
+        })();
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            document.querySelector('.theme-toggle').textContent = next === 'dark' ? '🌙' : '☀️';
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
+        }
+
+        // ===== Diff Algorithm =====
+        function computeLCS(a, b) {
+            const m = a.length, n = b.length;
+            const dp = Array.from({ length: m + 1 }, () => new Int32Array(n + 1));
+            for (let i = 1; i <= m; i++) {
+                for (let j = 1; j <= n; j++) {
+                    dp[i][j] = a[i-1] === b[j-1]
+                        ? dp[i-1][j-1] + 1
+                        : Math.max(dp[i-1][j], dp[i][j-1]);
+                }
+            }
+            return dp;
+        }
+
+        function backtrackLCS(dp, a, b, i, j) {
+            const ops = [];
+            const stack = [[i, j]];
+            while (stack.length > 0) {
+                const [ci, cj] = stack.pop();
+                if (ci === 0 || cj === 0) {
+                    while (ci > 0) { ops.push({ type: 'delete', aIdx: ci - 1 }); ci--; }
+                    while (cj > 0) { ops.push({ type: 'insert', bIdx: cj - 1 }); cj--; }
+                    continue;
+                }
+                if (a[ci-1] === b[cj-1]) {
+                    ops.push({ type: 'equal', aIdx: ci - 1, bIdx: cj - 1 });
+                    stack.push([ci - 1, cj - 1]);
+                } else if (dp[ci-1][cj] >= dp[ci][cj-1]) {
+                    ops.push({ type: 'delete', aIdx: ci - 1 });
+                    stack.push([ci - 1, cj]);
+                } else {
+                    ops.push({ type: 'insert', bIdx: cj - 1 });
+                    stack.push([ci, cj - 1]);
+                }
+            }
+            return ops.reverse();
+        }
+
+        function computeDiff(linesA, linesB, ignoreWS, caseSense) {
+            const normA = linesA.map(l => {
+                let s = l;
+                if (ignoreWS) s = s.replace(/\s+/g, '').trim();
+                if (!caseSense) s = s.toLowerCase();
+                return s;
+            });
+            const normB = linesB.map(l => {
+                let s = l;
+                if (ignoreWS) s = s.replace(/\s+/g, '').trim();
+                if (!caseSense) s = s.toLowerCase();
+                return s;
+            });
+            const dp = computeLCS(normA, normB);
+            return backtrackLCS(dp, normA, normB, normA.length, normB.length);
+        }
+
+        function computeCharDiff(strA, strB) {
+            const dp = computeLCS(strA, strB);
+            return backtrackLCS(dp, strA, strB, strA.length, strB.length);
+        }
+
+        function renderCharDiff(strA, strB, charOps) {
+            let resultA = '', resultB = '';
+            let aIdx = 0, bIdx = 0;
+            for (const op of charOps) {
+                if (op.type === 'equal') {
+                    const ch = strA[op.aIdx];
+                    resultA += ch;
+                    resultB += ch;
+                    aIdx++; bIdx++;
+                } else if (op.type === 'delete') {
+                    resultA += `<span class="char-diff del">${escapeHtml(strA[op.aIdx])}</span>`;
+                    resultB += `<span class="char-diff del"> </span>`;
+                    aIdx++;
+                } else if (op.type === 'insert') {
+                    resultA += `<span class="char-diff add"> </span>`;
+                    resultB += `<span class="char-diff add">${escapeHtml(strB[op.bIdx])}</span>`;
+                    bIdx++;
+                }
+            }
+            return { a: resultA, b: resultB };
+        }
+
+        function escapeHtml(s) {
+            return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function computeDiff() {
+            const textA = document.getElementById('textA').value;
+            const textB = document.getElementById('textB').value;
+            const ignoreWS = document.getElementById('ignoreWhitespace').checked;
+            const charLevel = document.getElementById('charLevel').checked;
+            const caseSense = document.getElementById('caseSensitive').checked;
+            const ctxLines = parseInt(document.getElementById('contextLines').value) || 3;
+
+            if (!textA && !textB) {
+                showToast('⚠️ 请在两栏中输入文本');
+                return;
+            }
+
+            const linesA = textA.split('\n');
+            const linesB = textB.split('\n');
+
+            const ops = computeDiff(linesA, linesB, ignoreWS, caseSense);
+
+            // Build result
+            let addCount = 0, delCount = 0, modCount = 0, eqCount = 0;
+            const resultLines = [];
+
+            // Mark changed ranges
+            let changedRanges = [];
+            let currentRange = null;
+            let idx = 0;
+            for (const op of ops) {
+                if (op.type === 'equal') {
+                    if (currentRange) {
+                        currentRange.end = idx;
+                        changedRanges.push(currentRange);
+                        currentRange = null;
+                    }
+                } else {
+                    if (!currentRange) {
+                        currentRange = { start: idx, end: idx };
+                    } else {
+                        currentRange.end = idx;
+                    }
+                }
+                idx++;
+            }
+            if (currentRange) changedRanges.push(currentRange);
+
+            // Build output lines with context
+            const ctxSet = new Set();
+            for (const r of changedRanges) {
+                for (let i = Math.max(0, r.start - ctxLines); i <= Math.min(ops.length - 1, r.end + ctxLines); i++) {
+                    ctxSet.add(i);
+                }
+            }
+
+            const allIdx = Array.from({ length: ops.length }, (_, i) => i);
+            const visibleIdx = allIdx.filter(i => ctxSet.has(i));
+
+            // Group visible lines with "skipped" markers
+            let prev = -2;
+            let aLineNum = 1, bLineNum = 1;
+            let outputAIdx = 1, outputBIdx = 1;
+
+            for (let i = 0; i < ops.length; i++) {
+                const op = ops[i];
+                if (op.type === 'equal') { aLineNum++; bLineNum++; continue; }
+                if (op.type === 'delete') { aLineNum++; continue; }
+                if (op.type === 'insert') { bLineNum++; continue; }
+            }
+
+            // Re-track with proper line numbering
+            let curA = 1, curB = 1;
+            for (let i = 0; i < ops.length; i++) {
+                const op = ops[i];
+                const isVisible = ctxSet.has(i);
+
+                if (op.type === 'equal') {
+                    if (isVisible) {
+                        const lineA = linesA[op.aIdx] || '';
+                        let cellA = `<span class="line-content">${escapeHtml(lineA)}</span>`;
+                        let cellB = `<span class="line-content">${escapeHtml(lineA)}</span>`;
+                        if (charLevel) {
+                            cellA = `<span class="line-content">${escapeHtml(lineA)}</span>`;
+                            cellB = `<span class="line-content">${escapeHtml(lineA)}</span>`;
+                        }
+                        resultLines.push(`<tr><td class="line-num">${curA}</td><td class="line-num">${curB}</td><td class="diff-eq" colspan="2">${cellA}</td></tr>`);
+                    }
+                    curA++; curB++;
+                    continue;
+                }
+
+                if (!isVisible) {
+                    if (op.type === 'delete') curA++;
+                    if (op.type === 'insert') curB++;
+                    continue;
+                }
+
+                if (op.type === 'delete') {
+                    const lineA = linesA[op.aIdx] || '';
+                    let cellA = `<span class="line-content">${escapeHtml(lineA)}</span>`;
+                    if (charLevel && curB <= linesB.length) {
+                        const nextOps = [];
+                        let j = i;
+                        let nextInsertB = -1;
+                        while (j < ops.length && ops[j].type === 'delete') j++;
+                        if (j < ops.length && ops[j].type === 'insert') {
+                            const lineB = linesB[ops[j].bIdx] || '';
+                            const charOps = computeCharDiff(lineA, lineB);
+                            const rendered = renderCharDiff(lineA, lineB, charOps);
+                            cellA = `<span class="line-content">${rendered.a}</span>`;
+                        }
+                    }
+                    resultLines.push(`<tr><td class="line-num line-num-del">${curA}</td><td class="line-num"></td><td class="diff-del" colspan="2">${cellA}</td></tr>`);
+                    delCount++;
+                    curA++;
+                } else if (op.type === 'insert') {
+                    const lineB = linesB[op.bIdx] || '';
+                    let cellB = `<span class="line-content">${escapeHtml(lineB)}</span>`;
+                    if (charLevel && curA > 1 && curA <= linesA.length) {
+                        // Look backward for a matching delete
+                        let prevDel = -1;
+                        for (let k = i - 1; k >= 0; k--) {
+                            if (ops[k].type === 'delete' && ctxSet.has(k)) {
+                                const prevOps = [];
+                                let skip = false;
+                                for (let m = k + 1; m < i; m++) {
+                                    if (ops[m].type !== 'delete' && ops[m].type !== 'insert') { skip = true; break; }
+                                }
+                                if (!skip) { prevDel = k; break; }
+                            }
+                        }
+                        if (prevDel >= 0) {
+                            const lineA = linesA[ops[prevDel].aIdx] || '';
+                            const charOps = computeCharDiff(lineA, lineB);
+                            const rendered = renderCharDiff(lineA, lineB, charOps);
+                            cellB = `<span class="line-content">${rendered.b}</span>`;
+                        }
+                    }
+                    resultLines.push(`<tr><td class="line-num"></td><td class="line-num line-num-add">${curB}</td><td class="diff-add" colspan="2">${cellB}</td></tr>`);
+                    addCount++;
+                    curB++;
+                }
+            }
+
+            const resultHtml = resultLines.join('\n');
+            const totalChanges = addCount + delCount;
+
+            document.getElementById('diffStats').innerHTML = `
+                <span class="diff-stat add">+${addCount} 新增</span>
+                <span class="diff-stat del">-${delCount} 删除</span>
+                <span class="diff-stat unchanged">${totalChanges} 处差异</span>
+            `;
+
+            const resultDiv = document.getElementById('diffResult');
+            const outputDiv = document.getElementById('diffOutput');
+            outputDiv.innerHTML = `<table class="diff-table">${resultHtml}</table>`;
+            resultDiv.classList.add('visible');
+
+            showToast(`✅ 发现 ${totalChanges} 处差异（+${addCount}/-${delCount}）`);
+        }
+
+        function swapInputs() {
+            const a = document.getElementById('textA');
+            const b = document.getElementById('textB');
+            [a.value, b.value] = [b.value, a.value];
+            computeDiff();
+        }
+
+        function loadSample() {
+            document.getElementById('textA').value = `function greet(name) {\n  console.log("Hello, " + name + "!");\n  return true;\n}\n\nfunction add(a, b) {\n  return a + b;\n}\n\n// This is the old version\nconst PI = 3.14;\n\nfunction circleArea(r) {\n  return PI * r * r;\n}`;
+            document.getElementById('textB').value = `function greet(name, title) {\n  console.log(\`Hello, \${title} \${name}!\`);\n  return true;\n}\n\nfunction add(a, b) {\n  return a + b;\n}\n\n// Updated to use Math.PI\nconst PI = Math.PI;\n\nfunction circleArea(r) {\n  return PI * r * r;\n}\n\nfunction rectangleArea(w, h) {\n  return w * h;\n}`;
+            computeDiff();
+        }
+
+        function clearAll() {
+            document.getElementById('textA').value = '';
+            document.getElementById('textB').value = '';
+            document.getElementById('diffResult').classList.remove('visible');
+            document.getElementById('diffStats').innerHTML = '';
+            showToast('🗑️ 已清空');
+        }
+
+        function copyResult() {
+            const outputDiv = document.getElementById('diffOutput');
+            const text = outputDiv.textContent || outputDiv.innerText;
+            if (!text.trim()) { showToast('⚠️ 没有可复制的内容'); return; }
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('✅ 差异结果已复制到剪贴板');
+            }).catch(() => {
+                showToast('⚠️ 复制失败，请手动选择复制');
+            });
+        }
+
+        // Keyboard shortcut
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                computeDiff();
+            }
+        });
+    </script>
+</body>
+</html>

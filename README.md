@@ -3,12 +3,12 @@
 每小时自动运行的 AI 系统，研究、实现、迭代网上赚钱方案。
 
 ## 策略
-**流量变现模式**：构建免费在线工具 → 吸引流量 → 广告收充
+**流量变现模式**：构建免费在线工具 → 吸引流量 → 广告收入
 
 ## 项目结构
 - `tools/` - 在线工具项目（每个子目录一个工具）
 - `content/` - SEO 内容
-- `logs/` - 运行日忖
+- `logs/` - 运行日志
 
 ## 当前状态
 | 日期 | 行动 | 结果 |
@@ -17,19 +17,40 @@
 | 2026-05-14 | 构建 JSON 格式化/校验工具 + SEO 内容文章 | ✅ 完成 |
 | 2026-05-14 | 构建 UUID/GUID 生成器 + SEO 文章 + 工具间交叉链接 | ✅ 完成 |
 | 2026-05-14 | 构建 Base64 编码解码器 + SEO 文章 + 更新所有工具交叉链接 | ✅ 完成 |
-| 2026-05-14 | 部署到 GitHub Pages 🌀 | ✅ 完成 |
+| 2026-05-14 | 构建密码生成器 + 交叉链接更新 + 更新首页到5个工具 | ✅ 完成 |
+| 2026-05-14 | 构建 Markdown 预览器 + 交叉链接更新 + 更新首页到6个工具 + SEO 内容 | ✅ 完成 |
+| 2026-05-14 | 构建时间戳转换工具 + 交叉链接更新 + 更新首页到7个工具 + SEO 内容 | ✅ 完成 |
+| 2026-05-14 | 构建单位换算器 + 交叉链接更新 + 更新首页到8个工具 + SEO 内容 | ✅ 完成 |
+| 2026-05-14 | 构建 URL 编码解码器 + 交叉链接更新 + 更新首页到9个工具 + SEO 内容 | ✅ 完成 |
+| 2026-05-14 | 构建颜色选择器/转换器 + 交叉链接到全部9个工具 + 更新首页到10个工具 + SEO 内容 | ✅ 完成 |
+| 2026-05-14 | 构建正则表达式测试器 + 交叉链接到全部10个工具 + 更新首页到11个工具 | ✅ 完成 |
+| 2026-05-14 | 构建进制转换器 + 交叉链接到全部11个工具 + 更新首页到12个工具 | ✅ 完成 |
+| 2026-05-14 | 构建文本对比工具(Diff Checker) + 交叉链接 + 更新首页分类布局(13个工具,5大类别) + SEO 内容 | ✅ 完成 |
 
-## 已杄延工具
-- [x] **字数统计工具** (`tools/word-counter/`) — 绿计中英文字数、字符数、段落数
-- [x] **JSON 格式化/校騌工具** (`tols/json-formatter/`) —美化、验证、压缩 JSON
-- [x] **UUID/GUID 呟成器** (`tools/uuid-generator/`) —階机 UUID v4 批量生成
-- [x] **Base64 编码解码器** (`tools/base64-encoder/`) —Base64 编解码及文件转码
+## 已完成工具
+- [x] **字数统计工具** (`tools/word-counter/`) — 实时统计中英文字数、字符数、段落数
+- [x] **JSON 格式化/校验工具** (`tools/json-formatter/`) — 美化、验证、压缩 JSON
+- [x] **UUID/GUID 生成器** (`tools/uuid-generator/`) — 随机 UUID v4 批量生成
+- [x] **Base64 编码解码器** (`tools/base64-encoder/`) — Base64 编解码及文件转码
+- [x] **密码生成器** (`tools/password-generator/`) — 随机强密码批量生成，密码强度检测
+- [x] **Markdown 预览器** (`tools/markdown-previewer/`) — 在线 Markdown 实时预览编辑
+- [x] **时间戳转换工具** (`tools/timestamp-converter/`) — Unix 时间戳与日期时间互转
+- [x] **单位换算器** (`tools/unit-converter/`) — 10大类单位互转，支持长度、重量、温度等
+- [x] **URL 编码解码器** (`tools/url-encoder/`) — URL Encode/Decode 在线互转，支持批量处理
+- [x] **颜色选择器/转换器** (`tools/color-picker/`) — 可视化取色器，HEX/RGB/HSL/HSV/CMYK 多格式互转，配色方案生成
+- [x] **正则表达式测试器** (`tools/regex-tester/`) — 实时测试正则匹配，捕获分组展示，替换功能，内置正则速查表
+- [x] **进制转换器** (`tools/number-base-converter/`) — 二进制/八进制/十进制/十六进制及自定义进制互转
+- [x] **文本对比工具** (`tools/diff-checker/`) — 两段文本逐行差异比较，字符级高亮，代码对比/文章校对/版本比较
 
-## 辅构建工具（按优先级）
-1. 密码生成器
-2. Markdown 预览器
-3. 时间戳转换工具
+## 待构建工具（按优先级）
+1. **首页分类改版** ✅ 已完成（5大类别：文本工具、编码工具、安全与生成工具、转换与计算工具、测试工具）
+2. 下一阶段：考虑以下新工具方向：
+   - 二维码生成器
+   - 在线 JSON ↔ CSV 转换
+   - 文本大小写转换器
+   - IP 地址查询工具
+   - 在线图片压缩工具
 
-## 部祲在路口
-- 在路口: [https://heiimz.github.io/ai-money-maker/](https://heiimz.github.io/ai-money-maker/)
+## 部署入口
+- 入口: [https://heiimz.github.io/it-tools/](https://heiimz.github.io/it-tools/)
 - GitHub: [heiimy/ai-money-maker](https://github.com/heiimy/ai-money-maker)

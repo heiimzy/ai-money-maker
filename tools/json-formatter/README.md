@@ -25,7 +25,7 @@
 
 ```bash
 # 部署到 GitHub Pages
-cd ~/ai-money-maker/
+cd ~/it-tools/
 git add tools/json-formatter/
 git commit -m "添加 JSON 格式化校验工具"
 git push

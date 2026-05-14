@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线颜色选择器 - HEX RGB HSL CMYK 颜色转换工具 | 免费开发工具</title>
+    <meta name="description" content="免费在线颜色选择器与转换工具。支持 HEX、RGB、HSL、HSV、CMYK 多格式颜色互转。可视化取色器，实时预览，生成邻近色、互补色、三色配色方案。设计师和前端开发必备工具。">
+    <meta name="keywords" content="颜色选择器,颜色转换,HEX转RGB,RGB转HEX,HSL,CMYK,色彩搭配,配色方案,互补色,邻近色,免费在线工具">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://it-tools.js.org/tools/color-picker/">
+    <meta property="og:title" content="在线颜色选择器 - HEX/RGB/HSL/CMYK 颜色转换工具">
+    <meta property="og:description" content="免费在线颜色选择器与转换工具。支持多种格式颜色的互转、实时预览、配色方案生成。">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="zh_CN">
+    <style>
+        :root {
+            --bg: #f0f2f5;
+            --bg-end: #fce4ec;
+            --card-bg: #ffffff;
+            --text: #1a1a2e;
+            --text-secondary: #666;
+            --border: #e8ecf1;
+            --primary: #e11d48;
+            --primary-dark: #be123c;
+            --primary-light: #fb7185;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --ad-bg: #f8f9fa;
+            --ad-border: #ddd;
+            --stat-bg: #fef2f2;
+            --stat-bg-end: #ffe4e6;
+            --code-bg: #f8f9fa;
+            --shadow: 0 4px 24px rgba(0,0,0,0.08);
+        }
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --bg-end: #1e1b4b;
+            --card-bg: #1e293b;
+            --text: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --primary: #fb7185;
+            --primary-dark: #f43f5e;
+            --primary-light: #fda4af;
+            --success: #34d399;
+            --warning: #fbbf24;
+            --ad-bg: #1e293b;
+            --ad-border: #475569;
+            --stat-bg: #1e293b;
+            --stat-bg-end: #0f172a;
+            --code-bg: #0f172a;
+            --shadow: 0 4px 24px rgba(0,0,0,0.3);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, var(--bg) 0%, var(--bg-end) 100%);
+            color: var(--text);
+            transition: background 0.3s, color 0.3s;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+        header {
+            background: linear-gradient(135deg, #e11d48, #7c3aed);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+        }
+        header h1 { font-size: 28px; }
+        header p { font-size: 16px; opacity: 0.9; }
+        .theme-toggle {
+            position: fixed; top: 16px; right: 20px; z-index: 100;
+            background: rgba(255,255,255,0.2); border: none; color: white;
+            width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+            font-size: 20px; display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(4px);
+            transition: background 0.2s;
+        }
+        .theme-toggle:hover { background: rgba(255,255,255,0.35); }
+        .tool-card {
+            background: var(--card-bg); border-radius: 16px;
+            box-shadow: var(--shadow); padding: 28px;
+            margin: -40px 0 30px; position: relative; z-index: 10;
+        }
+        .ad-placeholder {
+            background: var(--ad-bg); border: 2px dashed var(--border);
+            padding: 30px; text-align: center; border-radius: 8px;
+            margin: 20px 0; color: var(--text-secondary); font-size: 14px;
+        }
+        .ad-placeholder::before { content: "📢 "; }
+        .color-preview {
+            width: 100%;
+            height: 80px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 2px solid var(--border);
+            transition: background 0.15s;
+            position: relative;
+            overflow: hidden;
+        }
+        .color-preview::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: 8px; right: 12px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: monospace;
+        }
+        .picker-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+            margin-bottom: 20px;
+        }
+        .sat-bright-area {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: crosshair;
+            border: 2px solid var(--border);
+        }
+        .sat-bright-area canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        .picker-cursor {
+            position: absolute;
+            width: 18px; height: 18px;
+            border: 3px solid white;
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .hue-slider-container {
+            margin-top: 12px;
+            position: relative;
+        }
+        .hue-slider {
+            width: 100%;
+            height: 24px;
+            border-radius: 12px;
+            background: linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);
+            -webkit-appearance: none;
+            appearance: none;
+            outline: none;
+            cursor: pointer;
+            border: 2px solid var(--border);
+        }
+        .hue-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid var(--primary);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+        .hue-slider::-moz-range-thumb {
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid var(--primary);
+            cursor: pointer;
+        }
+        .color-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .color-input-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .color-input-group label {
+            font-size: 14px;
+            font-weight: 600;
+            width: 42px;
+            color: var(--text);
+            font-family: 'Courier New', monospace;
+        }
+        .color-input-group input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            background: var(--card-bg);
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .color-input-group input:focus {
+            border-color: var(--primary);
+        }
+        .color-input-group .copy-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .color-input-group .copy-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .color-input-group .copy-badge {
+            font-size: 11px;
+            color: var(--success);
+            opacity: 0;
+            transition: opacity 0.3s;
+            min-width: 50px;
+        }
+        .color-input-group .copy-badge.show { opacity: 1; }
+        .palette-section {
+            margin-top: 20px;
+        }
+        .palette-section h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: var(--text);
+        }
+        .palette-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        .palette-item {
+            border-radius: 10px;
+            padding: 16px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+        .palette-item:hover {
+            transform: translateY(-2px);
+        }
+        .palette-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            margin: 0 auto 8px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        .palette-item .hex-label {
+            font-size: 11px;
+            font-family: monospace;
+            color: var(--text-secondary);
+        }
+        .palette-item .palette-name {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+        .palette-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .palette-tabs button {
+            padding: 6px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .palette-tabs button.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .palette-tabs button:hover:not(.active) {
+            border-color: var(--primary);
+        }
+        .info-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 28px;
+            margin: 20px 0;
+            border: 1px solid var(--border);
+        }
+        .info-section h3 {
+            font-size: 18px;
+            margin: 20px 0 10px;
+            color: var(--text);
+        }
+        .info-section h3:first-child { margin-top: 0; }
+        .info-section p { color: var(--text-secondary); line-height: 1.8; margin-bottom: 12px; }
+        .info-section ul { 
+            list-style: disc; 
+            padding-left: 20px; 
+            color: var(--text-secondary);
+            line-height: 2;
+        }
+        .info-section ul li a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        .info-section ul li a:hover { text-decoration: underline; }
+        .tools-nav {
+            margin-top: 30px;
+            padding: 24px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        .tools-nav h3 {
+            font-size: 1.1rem;
+            margin-bottom: 14px;
+            color: var(--text);
+        }
+        .tools-nav a {
+            display: inline-block;
+            margin: 4px 8px;
+            padding: 8px 18px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: opacity 0.2s, transform 0.15s;
+        }
+        .tools-nav a:hover { opacity: 0.85; transform: translateY(-1px); }
+        footer {
+            text-align: center;
+            padding: 30px 0 40px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 2;
+        }
+        footer a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin: 0 4px;
+        }
+        footer a:hover { color: var(--primary); }
+        .copy-toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px);
+            background: var(--text); color: var(--bg); padding: 10px 24px;
+            border-radius: 10px; font-size: 14px; opacity: 0;
+            transition: all 0.3s; pointer-events: none; z-index: 200;
+        }
+        .copy-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .status-bar {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 14px; background: var(--code-bg, #f5f5f5);
+            border-radius: 8px; margin-top: 16px; font-size: 13px;
+        }
+        .status-indicator { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .status-valid { background: #10b981; }
+        .status-invalid { background: #ef4444; }
+        .status-idle { background: #9ca3af; }
+        .color-hex-display {
+            font-size: 24px;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .action-bar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+        .action-bar button {
+            padding: 8px 18px; border: none; border-radius: 8px; cursor: pointer;
+            font-size: 14px; font-weight: 500; transition: all 0.2s;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-ghost { background: transparent; border: 1px solid var(--border) !important; color: var(--text); }
+        .btn-ghost:hover { border-color: var(--primary) !important; color: var(--primary); }
+        @media (max-width: 700px) {
+            .picker-layout { grid-template-columns: 1fr; }
+            .sat-bright-area { max-width: 300px; margin: 0 auto; }
+            .palette-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 600px) {
+            header h1 { font-size: 22px; }
+            .tool-card { padding: 18px; margin-top: -30px; }
+            .action-bar { flex-direction: column; }
+            .action-bar button { width: 100%; justify-content: center; }
+            .theme-toggle { top: 12px; right: 12px; width: 36px; height: 36px; font-size: 16px; }
+            .color-input-group { flex-wrap: wrap; }
+            .color-input-group .copy-badge { min-width: auto; }
+            .palette-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle" aria-label="切换主题">🌙</button>
+
+<header>
+    <div class="container">
+        <h1>🎨 在线颜色选择器</h1>
+        <p>HEX / RGB / HSL / HSV / CMYK 多种格式互转 · 实时预览 · 配色方案生成</p>
+    </div>
+</header>
+
+<div class="container">
+    <div class="ad-placeholder">广告位 - Google AdSense / 百度联盟 (预留)</div>
+
+    <div class="tool-card">
+        <!-- Color preview bar -->
+        <div class="color-preview" id="colorPreview" data-label="#e11d48"></div>
+
+        <!-- Picker layout -->
+        <div class="picker-layout">
+            <div>
+                <div class="sat-bright-area" id="satBrightArea">
+                    <canvas id="satBrightCanvas" width="280" height="280"></canvas>
+                    <div class="picker-cursor" id="pickerCursor" style="left: 100%; top: 0;"></div>
+                </div>
+                <div class="hue-slider-container">
+                    <input type="range" class="hue-slider" id="hueSlider" min="0" max="360" value="348">
+                </div>
+            </div>
+            <div class="color-inputs">
+                <div class="color-hex-display" id="hexDisplay">#e11d48</div>
+                <div class="color-input-group">
+                    <label>HEX</label>
+                    <input type="text" id="hexInput" value="#e11d48" maxlength="9">
+                    <button class="copy-btn" onclick="copyColor('hex')">📋</button>
+                    <span class="copy-badge" id="hexBadge">✅ 已复制</span>
+                </div>
+                <div class="color-input-group">
+                    <label>RGB</label>
+                    <input type="text" id="rgbInput" value="rgb(225, 29, 72)">
+                    <button class="copy-btn" onclick="copyColor('rgb')">📋</button>
+                    <span class="copy-badge" id="rgbBadge">✅ 已复制</span>
+                </div>
+                <div class="color-input-group">
+                    <label>HSL</label>
+                    <input type="text" id="hslInput" value="hsl(347, 77%, 50%)">
+                    <button class="copy-btn" onclick="copyColor('hsl')">📋</button>
+                    <span class="copy-badge" id="hslBadge">✅ 已复制</span>
+                </div>
+                <div class="color-input-group">
+                    <label>HSV</label>
+                    <input type="text" id="hsvInput" value="hsv(347, 87%, 88%)">
+                    <button class="copy-btn" onclick="copyColor('hsv')">📋</button>
+                    <span class="copy-badge" id="hsvBadge">✅ 已复制</span>
+                </div>
+                <div class="color-input-group">
+                    <label>CMYK</label>
+                    <input type="text" id="cmykInput" value="cmyk(0%, 87%, 68%, 12%)">
+                    <button class="copy-btn" onclick="copyColor('cmyk')">📋</button>
+                    <span class="copy-badge" id="cmykBadge">✅ 已复制</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Palette section -->
+        <div class="palette-section">
+            <h3>🎯 配色方案</h3>
+            <div class="palette-tabs">
+                <button class="active" data-palette="complementary" onclick="switchPalette('complementary')">互补色</button>
+                <button data-palette="analogous" onclick="switchPalette('analogous')">邻近色</button>
+                <button data-palette="triadic" onclick="switchPalette('triadic')">三色配色</button>
+                <button data-palette="tetradic" onclick="switchPalette('tetradic')">四色配色</button>
+            </div>
+            <div class="palette-grid" id="paletteGrid"></div>
+        </div>
+
+        <div class="status-bar">
+            <span class="status-indicator status-valid" id="statusIndicator"></span>
+            <span id="statusText">就绪 — 点击颜色值旁的 📋 按钮复制</span>
+        </div>
+    </div>
+
+    <div class="ad-placeholder">广告位 - Google AdSense / 百度联盟 (预留)</div>
+
+    <div class="info-section">
+        <h3>💡 什么是颜色选择器？</h3>
+        <p>颜色选择器（Color Picker）是一种帮助用户选择颜色并获取其多种格式编码值的交互工具。无论是网页设计、UI/UX 设计、平面设计还是前端开发，颜色选择器都是最常用的辅助工具之一。本工具支持 <strong>HEX、RGB、HSL、HSV、CMYK</strong> 五种主流颜色格式的实时互转，并提供视觉化取色器。</p>
+        
+        <h3>🎨 五种颜色格式说明</h3>
+        <p><strong>HEX（十六进制）</strong>：以 <code>#RRGGBB</code> 或 <code>#RRGGBBAA</code> 格式表示颜色，是 Web 开发中最常用的颜色格式。每两位十六进制数代表红、绿、蓝通道的值（00-FF）。</p>
+        <p><strong>RGB（红绿蓝）</strong>：以 <code>rgb(R, G, B)</code> 格式表示，每个通道取值范围 0-255。这是显示设备最底层的颜色表示方式，通过三种基色的不同强度混合出所有颜色。</p>
+        <p><strong>HSL（色相/饱和度/明度）</strong>：更符合人类直觉的颜色模型。色相（H）0-360° 决定颜色类型，饱和度（S）0-100% 决定色彩鲜艳程度，明度（L）0-100% 决定颜色明暗。</p>
+        <p><strong>HSV（色相/饱和度/明度值）</strong>：与 HSL 类似但明度定义不同，HSV 的 V 值代表颜色的明亮程度（最大亮度）。在图形软件中广泛使用。</p>
+        <p><strong>CMYK（青/品红/黄/黑）</strong>：印刷行业的标准颜色模式，通过减色混合实现。C、M、Y、K 的取值范围 0-100%。</p>
+
+        <h3>🔗 更多免费在线工具</h3>
+        <ul>
+            <li><a href="../word-counter/">📝 在线字数统计工具</a> — 实时统计中英文字数、字符数、段落数</li>
+            <li><a href="../json-formatter/">🔧 JSON 格式化/校验工具</a> — 美化、验证、压缩 JSON 数据</li>
+            <li><a href="../uuid-generator/">🔑 UUID/GUID 生成器</a> — 批量生成 UUID v4</li>
+            <li><a href="../base64-encoder/">🔄 Base64 编码解码器</a> — 文本和文件 Base64 编解码</li>
+            <li><a href="../password-generator/">🔐 密码生成器</a> — 批量生成强密码，强度检测</li>
+            <li><a href="../markdown-previewer/">📝 Markdown 预览器</a> — 在线 Markdown 编辑器实时预览</li>
+            <li><a href="../timestamp-converter/">⏰ 时间戳转换工具</a> — Unix 时间戳与日期时间互转</li>
+            <li><a href="../unit-converter/">📐 单位换算器</a> — 10大类单位互转</li>
+            <li><a href="../url-encoder/">🔗 URL 编码解码器</a> — URL Encode/Decode 互转</li>
+            <li><a href="../regex-tester/">🔍 正则表达式测试器</a> — 在线正则匹配测试，支持分组展示和替换功能</li>
+        
+        <li><a href="../number-base-converter/">🔢 进制转换器</a> — 二进制/八进制/十进制/十六进制互转</li>
+                <li><a href="../diff-checker/">📋 文本对比</a></li>
+    </ul>
+        <p style="color: var(--text-secondary); font-size: 13px; margin-top: 12px;">🔒 所有数据仅在本地浏览器中处理，不会上传到服务器</p>
+    </div>
+
+    <div class="ad-placeholder">广告位 - Google AdSense / 百度联盟 (预留)</div>
+
+    <div class="tools-nav">
+        <h3>🔧 更多免费在线工具</h3>
+        <a href="../word-counter/">在线字数统计</a>
+        <a href="../json-formatter/">JSON 格式化</a>
+        <a href="../uuid-generator/">UUID 生成器</a>
+        <a href="../base64-encoder/">Base64 编解码</a>
+        <a href="../password-generator/">密码生成器</a>
+        <a href="../markdown-previewer/">Markdown 预览器</a>
+        <a href="../timestamp-converter/">时间戳转换</a>
+        <a href="../unit-converter/">单位换算器</a>
+        <a href="../url-encoder/">URL 编码解码</a>
+        <a href="../regex-tester/">🔍 正则表达式测试器</a>
+    </div>
+<a href="../number-base-converter/">进制转换器</a>
+            <a href="../diff-checker/">📋 文本对比</a></div>
+
+        <footer>
+    <p>© 2026 免费在线工具集 · 为设计师和开发者提供实用工具 · 数据仅在本地处理</p>
+    <p style="margin-top:4px; font-size:12px;">
+        <a href="../word-counter/">字数统计</a> ·
+        <a href="../json-formatter/">JSON 格式化</a> ·
+        <a href="../uuid-generator/">UUID 生成器</a> ·
+        <a href="../base64-encoder/">Base64 编解码</a> ·
+        <a href="../password-generator/">密码生成器</a> ·
+        <a href="../markdown-previewer/">Markdown 预览器</a> ·
+        <a href="../timestamp-converter/">时间戳转换</a> ·
+        <a href="../unit-converter/">单位换算器</a> ·
+        <a href="../url-encoder/">URL 编码解码</a> ·
+        <a href="../regex-tester/">正则表达式测试器</a>
+     · 
+            <a href="../number-base-converter/" style="color:var(--primary-light);text-decoration:none;">进制转换器</a>
+        </p>
+    </footer>
+
+<div class="copy-toast" id="copyToast">✅ 已复制到剪贴板</div>
+
+<script>
+(function() {
+    // ── Color state ──
+    let h = 348, s = 0.87, v = 0.88; // HSV
+
+    // DOM refs
+    const canvas = document.getElementById('satBrightCanvas');
+    const ctx = canvas.getContext('2d');
+    const satBrightArea = document.getElementById('satBrightArea');
+    const cursor = document.getElementById('pickerCursor');
+    const hueSlider = document.getElementById('hueSlider');
+    const hexInput = document.getElementById('hexInput');
+    const rgbInput = document.getElementById('rgbInput');
+    const hslInput = document.getElementById('hslInput');
+    const hsvInput = document.getElementById('hsvInput');
+    const cmykInput = document.getElementById('cmykInput');
+    const colorPreview = document.getElementById('colorPreview');
+    const hexDisplay = document.getElementById('hexDisplay');
+    const statusText = document.getElementById('statusText');
+    const statusIndicator = document.getElementById('statusIndicator');
+    const copyToast = document.getElementById('copyToast');
+
+    // ── Color conversion utilities ──
+    function HSVtoRGB(h, s, v) {
+        const c = v * s;
+        const hp = h / 60;
+        const x = c * (1 - Math.abs(hp % 2 - 1));
+        let r1, g1, b1;
+        if (hp < 1) { r1 = c; g1 = x; b1 = 0; }
+        else if (hp < 2) { r1 = x; g1 = c; b1 = 0; }
+        else if (hp < 3) { r1 = 0; g1 = c; b1 = x; }
+        else if (hp < 4) { r1 = 0; g1 = x; b1 = c; }
+        else if (hp < 5) { r1 = x; g1 = 0; b1 = c; }
+        else { r1 = c; g1 = 0; b1 = x; }
+        const m = v - c;
+        return {
+            r: Math.round((r1 + m) * 255),
+            g: Math.round((g1 + m) * 255),
+            b: Math.round((b1 + m) * 255)
+        };
+    }
+
+    function RGBtoHSV(r, g, b) {
+        r /= 255; g /= 255; b /= 255;
+        const max = Math.max(r, g, b), min = Math.min(r, g, b);
+        const d = max - min;
+        let h = 0;
+        if (d !== 0) {
+            if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) * 60;
+            else if (max === g) h = ((b - r) / d + 2) * 60;
+            else h = ((r - g) / d + 4) * 60;
+        }
+        const s = max === 0 ? 0 : d / max;
+        return { h: Math.round(h), s: parseFloat(s.toFixed(3)), v: parseFloat(max.toFixed(3)) };
+    }
+
+    function RGBtoHSL(r, g, b) {
+        r /= 255; g /= 255; b /= 255;
+        const max = Math.max(r, g, b), min = Math.min(r, g, b);
+        const l = (max + min) / 2;
+        if (max === min) return { h: 0, s: 0, l: Math.round(l * 100) };
+        const d = max - min;
+        const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        let h = 0;
+        if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) * 60;
+        else if (max === g) h = ((b - r) / d + 2) * 60;
+        else h = ((r - g) / d + 4) * 60;
+        return { h: Math.round(h), s: Math.round(s * 100), l: Math.round(l * 100) };
+    }
+
+    function RGBtoCMYK(r, g, b) {
+        const rr = r / 255, gg = g / 255, bb = b / 255;
+        const k = 1 - Math.max(rr, gg, bb);
+        if (k === 1) return { c: 0, m: 0, y: 0, k: 100 };
+        return {
+            c: Math.round(((1 - rr - k) / (1 - k)) * 100),
+            m: Math.round(((1 - gg - k) / (1 - k)) * 100),
+            y: Math.round(((1 - bb - k) / (1 - k)) * 100),
+            k: Math.round(k * 100)
+        };
+    }
+
+    function hexToRGB(hex) {
+        hex = hex.replace('#', '');
+        if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+        if (hex.length < 6) return null;
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 16);
+        const b = parseInt(hex.substring(4, 6), 16);
+        if (isNaN(r) || isNaN(g) || isNaN(b)) return null;
+        return { r, g, b };
+    }
+
+    function RGBtoHex(r, g, b) {
+        return '#' + [r, g, b].map(c => Math.max(0, Math.min(255, Math.round(c))).toString(16).padStart(2, '0')).join('');
+    }
+
+    function getCurrentRGB() { return HSVtoRGB(h, s, v); }
+
+    function getCurrentHex() {
+        const { r, g, b } = getCurrentRGB();
+        return RGBtoHex(r, g, b);
+    }
+
+    function getCurrentHSL() {
+        const { r, g, b } = getCurrentRGB();
+        return RGBtoHSL(r, g, b);
+    }
+
+    function getCurrentHSV() {
+        return { h, s: Math.round(s * 100), v: Math.round(v * 100) };
+    }
+
+    function getCurrentCMYK() {
+        const { r, g, b } = getCurrentRGB();
+        return RGBtoCMYK(r, g, b);
+    }
+
+    // ── Drawing ──
+    function drawSatBright() {
+        const w = canvas.width, h = canvas.height;
+        // Base hue color
+        const rgb = HSVtoRGB(h, 1, 1);
+        const baseStr = `rgb(${rgb.r},${rgb.g},${rgb.b})`;
+        
+        // Gradient from white to hue (left to right)
+        const gradX = ctx.createLinearGradient(0, 0, w, 0);
+        gradX.addColorStop(0, '#ffffff');
+        gradX.addColorStop(1, baseStr);
+        ctx.fillStyle = gradX;
+        ctx.fillRect(0, 0, w, h);
+
+        // Gradient from transparent to black (top to bottom)
+        const gradY = ctx.createLinearGradient(0, 0, 0, h);
+        gradY.addColorStop(0, 'rgba(0,0,0,0)');
+        gradY.addColorStop(1, 'rgba(0,0,0,1)');
+        ctx.fillStyle = gradY;
+        ctx.fillRect(0, 0, w, h);
+    }
+
+    function updateCursor(s, v) {
+        const rect = satBrightArea.getBoundingClientRect();
+        const canvasRect = canvas.getBoundingClientRect();
+        // s goes 0 (left) to 1 (right), v goes 1 (top) to 0 (bottom)
+        const x = s * canvasRect.width;
+        const y = (1 - v) * canvasRect.height;
+        cursor.style.left = x + 'px';
+        cursor.style.top = y + 'px';
+    }
+
+    function updateFromHSV() {
+        drawSatBright();
+        updateCursor(s, v);
+        updateInputs();
+    }
+
+    function updateInputs() {
+        const { r, g, b } = getCurrentRGB();
+        const hex = getCurrentHex();
+        const hsl = getCurrentHSL();
+        const hsv = getCurrentHSV();
+        const cmyk = getCurrentCMYK();
+
+        hexInput.value = hex;
+        rgbInput.value = `rgb(${r}, ${g}, ${b})`;
+        hslInput.value = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+        hsvInput.value = `hsv(${hsv.h}, ${hsv.s}%, ${hsv.v}%)`;
+        cmykInput.value = `cmyk(${cmyk.c}%, ${cmyk.m}%, ${cmyk.y}%, ${cmyk.k}%)`;
+        colorPreview.style.background = hex;
+        colorPreview.setAttribute('data-label', hex);
+        hexDisplay.textContent = hex;
+
+        updatePalette();
+        statusText.textContent = `当前颜色: ${hex} · 点击 📋 按钮复制`;
+        statusIndicator.className = 'status-indicator status-valid';
+    }
+
+    // ── Palette generation ──
+    let currentPalette = 'complementary';
+    let paletteColors = [];
+
+    function generatePalette(type) {
+        const colors = [];
+        const baseH = h;
+        switch (type) {
+            case 'complementary': {
+                const h2 = (baseH + 180) % 360;
+                colors.push({ h: baseH, name: '主色' });
+                colors.push({ h: h2, name: '互补色' });
+                // Add two shades
+                colors.push({ h: baseH, s: Math.max(0, s - 0.2), v: Math.min(1, v + 0.1), name: '主色浅色' });
+                colors.push({ h: h2, s: Math.max(0, s - 0.2), v: Math.min(1, v + 0.1), name: '互补浅色' });
+                break;
+            }
+            case 'analogous': {
+                for (let i = -2; i <= 1; i++) {
+                    const h2 = (baseH + i * 30 + 360) % 360;
+                    colors.push({ h: h2, name: i === 0 ? '主色' : i < 0 ? `偏移 ${Math.abs(i)*30}°` : `偏移 +${i*30}°` });
+                }
+                break;
+            }
+            case 'triadic': {
+                [0, 120, 240].forEach((offset, i) => {
+                    const h2 = (baseH + offset) % 360;
+                    colors.push({ h: h2, name: i === 0 ? '主色' : i === 1 ? '三分色 1' : '三分色 2' });
+                });
+                // Add one more
+                colors.push({ h: (baseH + 60) % 360, v: Math.max(0, v - 0.15), name: '强调色' });
+                break;
+            }
+            case 'tetradic': {
+                [0, 90, 180, 270].forEach((offset, i) => {
+                    const h2 = (baseH + offset) % 360;
+                    colors.push({ h: h2, name: i === 0 ? '主色' : i === 1 ? '四色 1' : i === 2 ? '互补色' : '四色 2' });
+                });
+                break;
+            }
+        }
+        return colors.map(c => {
+            const sh = c.h !== undefined ? c.h : h;
+            const ss = c.s !== undefined ? c.s : s;
+            const sv = c.v !== undefined ? c.v : v;
+            const rgb = HSVtoRGB(sh, ss, sv);
+            const hex = RGBtoHex(rgb.r, rgb.g, rgb.b);
+            return { hex, name: c.name, rgb };
+        });
+    }
+
+    function renderPalette() {
+        paletteColors = generatePalette(currentPalette);
+        const grid = document.getElementById('paletteGrid');
+        grid.innerHTML = paletteColors.map(c => `
+            <div class="palette-item" onclick="copyPaletteColor('${c.hex}')">
+                <div class="palette-swatch" style="background:${c.hex}"></div>
+                <div class="hex-label">${c.hex}</div>
+                <div class="palette-name">${c.name}</div>
+            </div>
+        `).join('');
+    }
+
+    function updatePalette() {
+        renderPalette();
+    }
+
+    window.switchPalette = function(type) {
+        currentPalette = type;
+        document.querySelectorAll('.palette-tabs button').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.palette === type);
+        });
+        renderPalette();
+    };
+
+    window.copyPaletteColor = function(hex) {
+        copyText(hex, null);
+    };
+
+    // ── Copy functions ──
+    function copyText(text, badgeId) {
+        navigator.clipboard.writeText(text).then(() => {
+            if (badgeId) {
+                const badge = document.getElementById(badgeId);
+                if (badge) {
+                    badge.classList.add('show');
+                    setTimeout(() => badge.classList.remove('show'), 1500);
+                }
+            }
+            copyToast.textContent = `✅ 已复制: ${text}`;
+            copyToast.classList.add('show');
+            setTimeout(() => copyToast.classList.remove('show'), 2000);
+        }).catch(() => {
+            copyToast.textContent = '⚠️ 复制失败';
+            copyToast.classList.add('show');
+            setTimeout(() => copyToast.classList.remove('show'), 2000);
+        });
+    }
+
+    window.copyColor = function(format) {
+        let text = '';
+        const badgeMap = { hex: 'hexBadge', rgb: 'rgbBadge', hsl: 'hslBadge', hsv: 'hsvBadge', cmyk: 'cmykBadge' };
+        const { r, g, b } = getCurrentRGB();
+        switch (format) {
+            case 'hex': text = getCurrentHex(); break;
+            case 'rgb': text = `rgb(${r}, ${g}, ${b})`; break;
+            case 'hsl': const hsl = getCurrentHSL(); text = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`; break;
+            case 'hsv': const hsv = getCurrentHSV(); text = `hsv(${hsv.h}, ${hsv.s}%, ${hsv.v}%)`; break;
+            case 'cmyk': const cmyk = getCurrentCMYK(); text = `cmyk(${cmyk.c}%, ${cmyk.m}%, ${cmyk.y}%, ${cmyk.k}%)`; break;
+        }
+        copyText(text, badgeMap[format]);
+    };
+
+    // ── Picker interaction ──
+    function getCanvasPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        const y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+        return { x, y };
+    }
+
+    let isDragging = false;
+
+    function onPointerDown(e) {
+        isDragging = true;
+        const pos = getCanvasPos(e);
+        s = pos.x;
+        v = 1 - pos.y;
+        updateFromHSV();
+    }
+
+    function onPointerMove(e) {
+        if (!isDragging) return;
+        const pos = getCanvasPos(e);
+        s = pos.x;
+        v = 1 - pos.y;
+        updateFromHSV();
+    }
+
+    function onPointerUp() {
+        isDragging = false;
+    }
+
+    // Mouse events
+    satBrightArea.addEventListener('mousedown', onPointerDown);
+    document.addEventListener('mousemove', onPointerMove);
+    document.addEventListener('mouseup', onPointerUp);
+
+    // Touch events
+    satBrightArea.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        onPointerDown({ clientX: touch.clientX, clientY: touch.clientY });
+    });
+    document.addEventListener('touchmove', function(e) {
+        if (!isDragging) return;
+        const touch = e.touches[0];
+        onPointerMove({ clientX: touch.clientX, clientY: touch.clientY });
+    });
+    document.addEventListener('touchend', onPointerUp);
+
+    // Hue slider
+    hueSlider.addEventListener('input', function() {
+        h = parseInt(this.value);
+        updateFromHSV();
+    });
+
+    // ── Manual input ──
+    function parseAndApply(str, type) {
+        let rgb = null;
+        if (type === 'hex') {
+            rgb = hexToRGB(str);
+        } else if (type === 'rgb') {
+            const m = str.match(/rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i);
+            if (m) rgb = { r: parseInt(m[1]), g: parseInt(m[2]), b: parseInt(m[3]) };
+        } else if (type === 'hsl') {
+            const m = str.match(/hsl\s*\(\s*(\d+)\s*,\s*(\d+)%\s*,\s*(\d+)%\s*\)/i);
+            if (m) {
+                const hslH = parseInt(m[1]), hslS = parseInt(m[2]) / 100, hslL = parseInt(m[3]) / 100;
+                // HSL to RGB
+                const c = (1 - Math.abs(2 * hslL - 1)) * hslS;
+                const hp = hslH / 60;
+                const x = c * (1 - Math.abs(hp % 2 - 1));
+                const m2 = hslL - c / 2;
+                let r1, g1, b1;
+                if (hp < 1) { r1 = c; g1 = x; b1 = 0; }
+                else if (hp < 2) { r1 = x; g1 = c; b1 = 0; }
+                else if (hp < 3) { r1 = 0; g1 = c; b1 = x; }
+                else if (hp < 4) { r1 = 0; g1 = x; b1 = c; }
+                else if (hp < 5) { r1 = x; g1 = 0; b1 = c; }
+                else { r1 = c; g1 = 0; b1 = x; }
+                rgb = { r: Math.round((r1 + m2) * 255), g: Math.round((g1 + m2) * 255), b: Math.round((b1 + m2) * 255) };
+            }
+        }
+        if (rgb && rgb.r >= 0 && rgb.r <= 255 && rgb.g >= 0 && rgb.g <= 255 && rgb.b >= 0 && rgb.b <= 255) {
+            const hsv = RGBtoHSV(rgb.r, rgb.g, rgb.b);
+            h = hsv.h;
+            s = hsv.s;
+            v = hsv.v;
+            hueSlider.value = h;
+            updateFromHSV();
+            statusText.textContent = `✅ 已应用: ${getCurrentHex()}`;
+            statusIndicator.className = 'status-indicator status-valid';
+        } else {
+            statusText.textContent = `⚠️ 格式错误: 无法解析 "${str}"`;
+            statusIndicator.className = 'status-indicator status-invalid';
+        }
+    }
+
+    let inputTimeout;
+    function onManualInput(type) {
+        clearTimeout(inputTimeout);
+        const inputs = {
+            hex: hexInput, rgb: rgbInput, hsl: hslInput, hsv: hsvInput, cmyk: cmykInput
+        };
+        inputTimeout = setTimeout(() => {
+            parseAndApply(inputs[type].value.trim(), type);
+        }, 400);
+    }
+
+    hexInput.addEventListener('input', () => onManualInput('hex'));
+    rgbInput.addEventListener('input', () => onManualInput('rgb'));
+    hslInput.addEventListener('input', () => onManualInput('hsl'));
+
+    // ── Theme toggle ──
+    const themeToggle = document.getElementById('themeToggle');
+    function applyTheme(dark) {
+        if (dark) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            themeToggle.textContent = '☀️';
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            themeToggle.textContent = '🌙';
+        }
+        localStorage.setItem('theme', dark ? 'dark' : 'light');
+    }
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark') { applyTheme(true); }
+    else if (saved === 'light') { applyTheme(false); }
+    else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) { applyTheme(true); }
+    themeToggle.addEventListener('click', () => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        applyTheme(!isDark);
+    });
+
+    // ── Keyboard shortcut: Ctrl+Enter ──
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            e.preventDefault();
+            // Re-parse the currently focused input
+            const active = document.activeElement;
+            if (active === hexInput) parseAndApply(hexInput.value.trim(), 'hex');
+            else if (active === rgbInput) parseAndApply(rgbInput.value.trim(), 'rgb');
+            else if (active === hslInput) parseAndApply(hslInput.value.trim(), 'hsl');
+        }
+    });
+
+    // ── Init ──
+    updateFromHSV();
+})();
+</script>
+</body>
+</html>

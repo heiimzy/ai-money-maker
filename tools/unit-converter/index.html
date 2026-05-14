@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>单位换算器 - 在线免费长度/重量/温度/面积单位转换 | 实用工具</title>
+<meta name="description" content="免费在线单位换算器，支持长度、重量、温度、体积、面积、速度、时间、数据存储、压力、能量等10大类单位互转。实时转换，即输即得，无需注册。">
+<meta name="keywords" content="单位换算器,单位转换,长度换算,重量换算,温度转换,面积换算,体积换算,速度换算,在线换算工具,免费工具">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://heiimz.github.io/it-tools/tools/unit-converter/">
+<meta property="og:title" content="在线单位换算器 - 10大类单位自由转换，实时即输即得">
+<meta property="og:description" content="免费在线单位换算工具，支持长度、重量、温度、体积、面积、速度、时间、数据存储、压力、能量等10大类单位互转，实时转换，即输即得。">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="zh_CN">
+<style>
+:root {
+    --bg: #f0f2f5;
+    --bg-end: #d4d9e8;
+    --card-bg: #ffffff;
+    --text: #1a1a2e;
+    --text-secondary: #666;
+    --border: #e8ecf1;
+    --shadow: 0 8px 30px rgba(0,0,0,0.08);
+    --primary: #8b5cf6;
+    --primary-dark: #7c3aed;
+    --primary-light: #a78bfa;
+    --primary-hover: #7c3aed;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --ad-bg: #f8f9fa;
+    --ad-border: #ddd;
+    --code-bg: #f8fafc;
+    --stat-bg: #f5f3ff;
+    --stat-bg-end: #ede9fe;
+    --input-bg: #ffffff;
+    --input-border: #d1d5db;
+    --footer-bg: #1e293b;
+    --footer-text: #94a3b8;
+    --cat-bg: #f5f3ff;
+    --cat-hover: #ede9fe;
+    --cat-active: #8b5cf6;
+    --cat-active-text: #fff;
+}
+[data-theme="dark"] {
+    --bg: #0f172a;
+    --bg-end: #1e293b;
+    --card-bg: #1e293b;
+    --text: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --border: #334155;
+    --shadow: 0 8px 30px rgba(0,0,0,0.3);
+    --primary: #a78bfa;
+    --primary-dark: #8b5cf6;
+    --primary-light: #c4b5fd;
+    --primary-hover: #8b5cf6;
+    --success: #34d399;
+    --warning: #fbbf24;
+    --danger: #f87171;
+    --ad-bg: #1e293b;
+    --ad-border: #475569;
+    --code-bg: #0f172a;
+    --stat-bg: #1e1b4b;
+    --stat-bg-end: #2e1065;
+    --input-bg: #0f172a;
+    --input-border: #475569;
+    --footer-bg: #020617;
+    --footer-text: #64748b;
+    --cat-bg: #1e1b4b;
+    --cat-hover: #2e1065;
+    --cat-active: #7c3aed;
+    --cat-active-text: #fff;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    background: linear-gradient(135deg, var(--bg) 0%, var(--bg-end) 100%);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+    transition: background 0.3s, color 0.3s;
+}
+.container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+
+/* Header */
+header {
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    color: white; padding: 32px 0 60px; text-align: center; position: relative;
+}
+header h1 { font-size: 28px; margin-bottom: 6px; letter-spacing: 1px; }
+header p { font-size: 15px; opacity: 0.9; max-width: 600px; margin: 0 auto; }
+
+/* Theme Toggle */
+.theme-toggle {
+    position: fixed; top: 16px; right: 20px; z-index: 100;
+    background: rgba(255,255,255,0.2); border: none; color: white;
+    width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+    font-size: 20px; display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(4px); transition: background 0.2s;
+}
+.theme-toggle:hover { background: rgba(255,255,255,0.35); }
+
+/* Tool Card */
+.tool-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 28px;
+    margin: -40px 0 24px;
+    position: relative;
+    z-index: 10;
+}
+
+/* Category Selector */
+.cat-selector {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; justify-content: center;
+}
+.cat-btn {
+    padding: 8px 16px; border: 1px solid var(--border); border-radius: 8px;
+    cursor: pointer; font-size: 13px; font-weight: 500;
+    background: var(--cat-bg); color: var(--text);
+    transition: all 0.2s;
+}
+.cat-btn:hover { background: var(--cat-hover); }
+.cat-btn.active { background: var(--cat-active); color: var(--cat-active-text); border-color: var(--cat-active); }
+
+/* Converter Grid */
+.converter-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.converter-input-group {
+    display: flex; flex-direction: column; gap: 8px;
+}
+.converter-input-group label {
+    font-size: 13px; color: var(--text-secondary); font-weight: 500;
+}
+.converter-input {
+    width: 100%;
+    font-family: 'Courier New', monospace;
+    font-size: 18px;
+    padding: 12px 16px;
+    border: 2px solid var(--input-border);
+    border-radius: 10px;
+    background: var(--input-bg);
+    color: var(--text);
+    transition: border-color 0.2s;
+}
+.converter-input:focus { outline: none; border-color: var(--primary); }
+.converter-select {
+    width: 100%;
+    padding: 10px 12px; font-size: 14px;
+    border: 2px solid var(--input-border);
+    border-radius: 8px;
+    background: var(--input-bg);
+    color: var(--text);
+    cursor: pointer; transition: border-color 0.2s;
+}
+.converter-select:focus { outline: none; border-color: var(--primary); }
+.swap-btn {
+    width: 44px; height: 44px; border-radius: 50%;
+    border: 2px solid var(--border); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; background: var(--card-bg);
+    color: var(--primary); transition: all 0.2s;
+    flex-shrink: 0;
+}
+.swap-btn:hover { background: var(--stat-bg); border-color: var(--primary); transform: rotate(180deg); }
+
+/* Quick Conversions */
+.quick-conversions {
+    margin-top: 20px;
+    padding: 16px;
+    background: var(--code-bg);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+}
+.quick-conversions h4 {
+    font-size: 14px; color: var(--text-secondary);
+    margin-bottom: 10px; font-weight: 500;
+}
+.quick-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 6px;
+}
+.quick-item {
+    display: flex; justify-content: space-between;
+    padding: 6px 10px; border-radius: 6px;
+    font-size: 13px; cursor: pointer; transition: background 0.15s;
+}
+.quick-item:hover { background: var(--stat-bg); }
+.quick-item .val { font-family: 'Courier New', monospace; color: var(--primary); font-weight: 500; }
+
+/* Ad Placeholder */
+.ad-placeholder {
+    background: var(--ad-bg); border: 2px dashed var(--ad-border);
+    padding: 30px; text-align: center; border-radius: 8px;
+    margin: 20px 0; color: var(--text-secondary); font-size: 14px;
+    transition: background 0.3s, border-color 0.3s;
+}
+
+/* Info Section */
+.info-section {
+    background: var(--card-bg); border-radius: 16px;
+    padding: 24px; margin: 20px 0;
+    border: 1px solid var(--border);
+}
+.info-section h3 {
+    font-size: 18px; margin: 20px 0 10px;
+    color: var(--primary);
+}
+.info-section h3:first-child { margin-top: 0; }
+.info-section p { font-size: 14px; color: var(--text-secondary); line-height: 1.8; }
+.info-section ul { margin: 8px 0 0 20px; }
+.info-section ul li { font-size: 14px; color: var(--text-secondary); line-height: 1.8; }
+.info-section ul li a { color: var(--primary); text-decoration: none; }
+.info-section ul li a:hover { text-decoration: underline; }
+
+/* Tools Nav */
+.tools-nav {
+    margin-top: 30px; margin-bottom: 20px;
+    padding: 24px; background: var(--card-bg);
+    border-radius: 12px; border: 1px solid var(--border);
+}
+.tools-nav h3 { font-size: 1.1rem; margin-bottom: 14px; }
+.tools-nav a {
+    display: inline-block; margin: 4px 8px; padding: 8px 18px;
+    background: var(--primary); color: white;
+    text-decoration: none; border-radius: 8px;
+    font-size: 14px; font-weight: 500;
+    transition: opacity 0.2s, transform 0.15s;
+}
+.tools-nav a:hover { opacity: 0.85; transform: translateY(-1px); }
+
+/* Copy Toast */
+.copy-toast {
+    position: fixed; bottom: 30px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--text); color: var(--bg); padding: 10px 24px;
+    border-radius: 10px; font-size: 14px; opacity: 0;
+    transition: all 0.3s; pointer-events: none; z-index: 200;
+}
+.copy-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Footer */
+footer {
+    background: var(--footer-bg);
+    color: var(--footer-text);
+    padding: 30px 0; margin-top: 40px; text-align: center; font-size: 13px;
+}
+footer a {
+    color: var(--primary-light); text-decoration: none; margin: 0 6px;
+}
+footer a:hover { text-decoration: underline; }
+footer .sep { color: var(--border); margin: 0 4px; }
+
+/* Responsive */
+@media (max-width: 600px) {
+    header h1 { font-size: 22px; }
+    header p { font-size: 13px; }
+    .tool-card { padding: 18px; margin-top: -30px; }
+    .converter-grid { grid-template-columns: 1fr; }
+    .swap-btn { width: 100%; border-radius: 8px; }
+    .swap-btn:hover { transform: none; }
+    .theme-toggle { top: 12px; right: 12px; width: 36px; height: 36px; font-size: 16px; }
+    .quick-grid { grid-template-columns: 1fr; }
+    .cat-btn { font-size: 12px; padding: 6px 12px; }
+}
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle" aria-label="切换主题">🌙</button>
+
+<header>
+    <div class="container">
+        <h1>📐 在线单位换算器</h1>
+        <p>10 大类单位自由互换 · 实时转换 · 即输即得</p>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- AD SLOT: top -->
+    <div class="ad-placeholder">广告位 - Google AdSense / 广告联盟 (预留)</div>
+
+    <!-- Tool Card -->
+    <div class="tool-card">
+        <!-- Category Selector -->
+        <div class="cat-selector" id="catSelector">
+            <button class="cat-btn active" data-cat="length">📏 长度</button>
+            <button class="cat-btn" data-cat="weight">⚖️ 重量</button>
+            <button class="cat-btn" data-cat="temperature">🌡️ 温度</button>
+            <button class="cat-btn" data-cat="volume">🧪 体积</button>
+            <button class="cat-btn" data-cat="area">📐 面积</button>
+            <button class="cat-btn" data-cat="speed">🚀 速度</button>
+            <button class="cat-btn" data-cat="time">⏱️ 时间</button>
+            <button class="cat-btn" data-cat="data">💾 数据</button>
+            <button class="cat-btn" data-cat="pressure">🔄 压力</button>
+            <button class="cat-btn" data-cat="energy">⚡ 能量</button>
+        </div>
+
+        <!-- Converter -->
+        <div class="converter-grid">
+            <div class="converter-input-group">
+                <label for="fromValue">从 (From)</label>
+                <input type="text" class="converter-input" id="fromValue" value="1" oninput="convert()" autofocus>
+                <select class="converter-select" id="fromUnit" onchange="convert()"></select>
+            </div>
+            <button class="swap-btn" onclick="swapUnits()" title="互换单位">⇄</button>
+            <div class="converter-input-group">
+                <label for="toValue">到 (To)</label>
+                <input type="text" class="converter-input" id="toValue" value="" readonly placeholder="结果">
+                <select class="converter-select" id="toUnit" onchange="convert()"></select>
+            </div>
+        </div>
+
+        <!-- Quick Conversions -->
+        <div class="quick-conversions">
+            <h4>📊 常用换算参考</h4>
+            <div class="quick-grid" id="quickGrid"></div>
+        </div>
+    </div>
+
+    <!-- AD SLOT: middle -->
+    <div class="ad-placeholder">广告位 - Google AdSense / 广告联盟 (预留)</div>
+
+    <!-- Info Section -->
+    <div class="info-section">
+        <h3>💡 使用说明</h3>
+        <p>在「从」输入框中输入数值，选择对应的单位类别和单位，工具会自动实时计算出所有转换结果。点击 ⇄ 按钮可快速互换「从」和「到」的单位。</p>
+        <p>支持 10 大类、100+ 种常用单位的即时换算。所有计算在浏览器本地完成，不会上传任何数据。</p>
+
+        <h3>🛠️ 支持的换算类别</h3>
+        <p><strong>📏 长度：</strong>毫米、厘米、米、千米、英寸、英尺、码、英里、海里</p>
+        <p><strong>⚖️ 重量：</strong>毫克、克、千克、吨、盎司、磅、英石</p>
+        <p><strong>🌡️ 温度：</strong>摄氏度 (°C)、华氏度 (°F)、开尔文 (K)</p>
+        <p><strong>🧪 体积：</strong>毫升、升、立方米、加仑、夸脱、品脱、杯、液量盎司、汤匙、茶匙</p>
+        <p><strong>📐 面积：</strong>平方毫米、平方厘米、平方米、公顷、平方公里、平方英寸、平方英尺、平方码、英亩、平方英里</p>
+        <p><strong>🚀 速度：</strong>米/秒、千米/小时、英里/小时、节、英尺/秒</p>
+        <p><strong>⏱️ 时间：</strong>毫秒、秒、分钟、小时、天、周、月、年</p>
+        <p><strong>💾 数据存储：</strong>比特、字节、KB、MB、GB、TB、PB</p>
+        <p><strong>🔄 压力：</strong>帕斯卡、千帕、巴、PSI、标准大气压、毫米汞柱、托</p>
+        <p><strong>⚡ 能量：</strong>焦耳、千焦、卡路里、千卡、瓦时、千瓦时、电子伏特、BTU</p>
+
+        <h3>🔗 更多免费在线工具</h3>
+        <ul>
+            <li><a href="../word-counter/">📝 在线字数统计工具</a> — 实时统计中英文字数、字符数</li>
+            <li><a href="../json-formatter/">📋 JSON 格式化/校验工具</a> — 美化、验证、压缩 JSON</li>
+            <li><a href="../uuid-generator/">🆔 UUID/GUID 生成器</a> — 随机 UUID v4 批量生成</li>
+            <li><a href="../base64-encoder/">🔐 Base64 编码解码器</a> — Base64 编解码及文件转码</li>
+            <li><a href="../password-generator/">🔑 密码生成器</a> — 随机强密码批量生成，密码强度检测</li>
+            <li><a href="../markdown-previewer/">📝 Markdown 预览器</a> — 实时预览编辑</li>
+            <li><a href="../timestamp-converter/">⏰ 时间戳转换工具</a> — Unix 时间戳互转</li>
+            <li><a href="../url-encoder/">🔗 URL 编码解码器</a> — URL Encode/Decode 在线互转</li>
+        <li><a href="../color-picker/">🎨 颜色选择器</a> — 颜色转换与配色方案生成</li>
+            <li><a href="../regex-tester/">🔍 正则表达式测试器</a> — 实时测试正则匹配，分组展示，替换功能</li>
+        
+        <li><a href="../number-base-converter/">🔢 进制转换器</a> — 二进制/八进制/十进制/十六进制互转</li>
+                <li><a href="../diff-checker/">📋 文本对比</a></li>
+    </ul>
+    </div>
+
+    <!-- AD SLOT: bottom -->
+    <div class="ad-placeholder">广告位 - Google AdSense / 广告联盟 (预留)</div>
+
+    <!-- Cross-link Nav -->
+    <div class="tools-nav">
+        <h3>🔧 更多免费在线工具</h3>
+        <a href="../word-counter/">📝 字数统计</a>
+        <a href="../json-formatter/">📋 JSON 格式化</a>
+        <a href="../uuid-generator/">🆔 UUID 生成器</a>
+        <a href="../base64-encoder/">🔐 Base64 编解码</a>
+        <a href="../password-generator/">🔑 密码生成器</a>
+        <a href="../markdown-previewer/">📝 Markdown 预览</a>
+        <a href="../timestamp-converter/">⏰ 时间戳转换</a>
+        <a href="../url-encoder/">🔗 URL 编码解码</a>
+        <a href="../color-picker/">🎨 颜色选择器</a>
+    </div>
+<a href="../number-base-converter/">进制转换器</a>
+            <a href="../diff-checker/">📋 文本对比</a></div>
+
+    <footer>
+    <p>© 2026 在线工具集 · 免费为开发者提供实用工具 · 所有数据仅在本地浏览器处理，不会上传到服务器</p>
+    <p style="margin-top:6px;">
+        <a href="../word-counter/">字数统计</a><span class="sep">·</span>
+        <a href="../json-formatter/">JSON 格式化</a><span class="sep">·</span>
+        <a href="../uuid-generator/">UUID 生成器</a><span class="sep">·</span>
+        <a href="../base64-encoder/">Base64 编解码</a><span class="sep">·</span>
+        <a href="../password-generator/">密码生成器</a><span class="sep">·</span>
+        <a href="../markdown-previewer/">Markdown 预览</a><span class="sep">·</span>
+        <a href="../timestamp-converter/">时间戳转换</a><span class="sep">·</span>
+        <a href="../url-encoder/">URL 编码解码</a><span class="sep">·</span>
+        <a href="../color-picker/">颜色选择器</a>
+    </p>
+</footer>
+
+<div class="copy-toast" id="copyToast">✅ 已复制到剪贴板</div>
+
+<script>
+(function() {
+    // ===== CONVERSION DATA =====
+    const categories = {
+        length: {
+            label: '长度',
+            icon: '📏',
+            units: ['millimeter','centimeter','meter','kilometer','inch','foot','yard','mile','nautical_mile'],
+            unitLabels: { millimeter:'毫米 (mm)', centimeter:'厘米 (cm)', meter:'米 (m)', kilometer:'千米 (km)', inch:'英寸 (in)', foot:'英尺 (ft)', yard:'码 (yd)', mile:'英里 (mi)', nautical_mile:'海里 (nmi)' },
+            toBase: { millimeter:0.001, centimeter:0.01, meter:1, kilometer:1000, inch:0.0254, foot:0.3048, yard:0.9144, mile:1609.344, nautical_mile:1852 },
+            quickRefs: [{label:'1 米 =',val:100,unit:'centimeter'},{label:'1 千米 =',val:0.621371,unit:'mile'},{label:'1 英寸 =',val:2.54,unit:'centimeter'},{label:'1 英尺 =',val:0.3048,unit:'meter'}],
+            defaultFrom:'meter', defaultTo:'centimeter'
+        },
+        weight: {
+            label: '重量',
+            icon: '⚖️',
+            units: ['milligram','gram','kilogram','ton','ounce','pound','stone'],
+            unitLabels: { milligram:'毫克 (mg)', gram:'克 (g)', kilogram:'千克 (kg)', ton:'吨 (t)', ounce:'盎司 (oz)', pound:'磅 (lb)', stone:'英石 (st)' },
+            toBase: { milligram:0.001, gram:1, kilogram:1000, ton:1000000, ounce:28.3495, pound:453.592, stone:6350.29 },
+            quickRefs: [{label:'1 千克 =',val:2.20462,unit:'pound'},{label:'1 磅 =',val:0.453592,unit:'kilogram'},{label:'1 盎司 =',val:28.3495,unit:'gram'},{label:'1 吨 =',val:1000,unit:'kilogram'}],
+            defaultFrom:'kilogram', defaultTo:'pound'
+        },
+        temperature: {
+            label: '温度',
+            icon: '🌡️',
+            units: ['celsius','fahrenheit','kelvin'],
+            unitLabels: { celsius:'摄氏度 (°C)', fahrenheit:'华氏度 (°F)', kelvin:'开尔文 (K)' },
+            toBase: { celsius:1, fahrenheit:1, kelvin:1 },
+            convert: {
+                toBase: function(val, unit) {
+                    if (unit === 'celsius') return val;
+                    if (unit === 'fahrenheit') return (val - 32) * 5/9;
+                    if (unit === 'kelvin') return val - 273.15;
+                    return val;
+                },
+                fromBase: function(val, unit) {
+                    if (unit === 'celsius') return val;
+                    if (unit === 'fahrenheit') return val * 9/5 + 32;
+                    if (unit === 'kelvin') return val + 273.15;
+                    return val;
+                }
+            },
+            quickRefs: [{label:'0 °C =',val:32,unit:'fahrenheit'},{label:'100 °C =',val:212,unit:'fahrenheit'},{label:'37 °C =',val:98.6,unit:'fahrenheit'},{label:'-40 °C =',val:-40,unit:'fahrenheit'}],
+            defaultFrom:'celsius', defaultTo:'fahrenheit'
+        },
+        volume: {
+            label: '体积',
+            icon: '🧪',
+            units: ['milliliter','liter','cubic_meter','gallon','quart','pint','cup','fl_oz','tablespoon','teaspoon'],
+            unitLabels: { milliliter:'毫升 (mL)', liter:'升 (L)', cubic_meter:'立方米 (m³)', gallon:'加仑 (gal)', quart:'夸脱 (qt)', pint:'品脱 (pt)', cup:'杯 (cup)', fl_oz:'液量盎司 (fl oz)', tablespoon:'汤匙 (tbsp)', teaspoon:'茶匙 (tsp)' },
+            toBase: { milliliter:0.001, liter:1, cubic_meter:1000, gallon:3.78541, quart:0.946353, pint:0.473176, cup:0.236588, fl_oz:0.0295735, tablespoon:0.0147868, teaspoon:0.00492892 },
+            quickRefs: [{label:'1 升 =',val:4.22675,unit:'cup'},{label:'1 加仑 =',val:3.78541,unit:'liter'},{label:'1 杯 =',val:236.588,unit:'milliliter'},{label:'1 汤匙 =',val:14.7868,unit:'milliliter'}],
+            defaultFrom:'liter', defaultTo:'cup'
+        },
+        area: {
+            label: '面积',
+            icon: '📐',
+            units: ['sq_mm','sq_cm','sq_meter','hectare','sq_km','sq_inch','sq_foot','sq_yard','acre','sq_mile'],
+            unitLabels: { sq_mm:'平方毫米 (mm²)', sq_cm:'平方厘米 (cm²)', sq_meter:'平方米 (m²)', hectare:'公顷 (ha)', sq_km:'平方公里 (km²)', sq_inch:'平方英寸 (in²)', sq_foot:'平方英尺 (ft²)', sq_yard:'平方码 (yd²)', acre:'英亩 (ac)', sq_mile:'平方英里 (mi²)' },
+            toBase: { sq_mm:0.000001, sq_cm:0.0001, sq_meter:1, hectare:10000, sq_km:1000000, sq_inch:0.00064516, sq_foot:0.092903, sq_yard:0.836127, acre:4046.86, sq_mile:2589988.11 },
+            quickRefs: [{label:'1 平方米 =',val:10.7639,unit:'sq_foot'},{label:'1 公顷 =',val:2.47105,unit:'acre'},{label:'1 亩 ≈',val:666.667,unit:'sq_meter'},{label:'1 平方英里 =',val:2.58999,unit:'sq_km'}],
+            defaultFrom:'sq_meter', defaultTo:'sq_foot'
+        },
+        speed: {
+            label: '速度',
+            icon: '🚀',
+            units: ['mps','kmh','mph','knot','fps'],
+            unitLabels: { mps:'米/秒 (m/s)', kmh:'千米/小时 (km/h)', mph:'英里/小时 (mph)', knot:'节 (kn)', fps:'英尺/秒 (ft/s)' },
+            toBase: { mps:1, kmh:0.277778, mph:0.44704, knot:0.514444, fps:0.3048 },
+            quickRefs: [{label:'60 km/h =',val:37.2823,unit:'mph'},{label:'1 节 =',val:1.852,unit:'kmh'},{label:'100 km/h =',val:27.7778,unit:'mps'},{label:'10 m/s =',val:32.8084,unit:'fps'}],
+            defaultFrom:'kmh', defaultTo:'mph'
+        },
+        time: {
+            label: '时间',
+            icon: '⏱️',
+            units: ['ms','sec','min','hour','day','week','month','year'],
+            unitLabels: { ms:'毫秒 (ms)', sec:'秒 (s)', min:'分钟 (min)', hour:'小时 (h)', day:'天 (d)', week:'周 (wk)', month:'月 (mo)', year:'年 (yr)' },
+            toBase: { ms:0.001, sec:1, min:60, hour:3600, day:86400, week:604800, month:2628000, year:31536000 },
+            quickRefs: [{label:'1 天 =',val:24,unit:'hour'},{label:'1 小时 =',val:60,unit:'min'},{label:'1 周 =',val:7,unit:'day'},{label:'1 年 ≈',val:365,unit:'day'}],
+            defaultFrom:'hour', defaultTo:'min'
+        },
+        data: {
+            label: '数据',
+            icon: '💾',
+            units: ['bit','byte','kb','mb','gb','tb','pb'],
+            unitLabels: { bit:'比特 (bit)', byte:'字节 (B)', kb:'千字节 (KB)', mb:'兆字节 (MB)', gb:'吉字节 (GB)', tb:'太字节 (TB)', pb:'拍字节 (PB)' },
+            toBase: { bit:0.125, byte:1, kb:1024, mb:1048576, gb:1073741824, tb:1099511627776, pb:1125899906842624 },
+            quickRefs: [{label:'1 MB =',val:1024,unit:'kb'},{label:'1 GB =',val:1024,unit:'mb'},{label:'1 TB =',val:1024,unit:'gb'},{label:'1 KB =',val:1024,unit:'byte'}],
+            defaultFrom:'mb', defaultTo:'gb'
+        },
+        pressure: {
+            label: '压力',
+            icon: '🔄',
+            units: ['pascal','kpa','bar','psi','atm','mmhg','torr'],
+            unitLabels: { pascal:'帕斯卡 (Pa)', kpa:'千帕 (kPa)', bar:'巴 (bar)', psi:'PSI (psi)', atm:'标准大气压 (atm)', mmhg:'毫米汞柱 (mmHg)', torr:'托 (Torr)' },
+            toBase: { pascal:1, kpa:1000, bar:100000, psi:6894.76, atm:101325, mmhg:133.322, torr:133.322 },
+            quickRefs: [{label:'1 atm =',val:101.325,unit:'kpa'},{label:'1 bar =',val:100,unit:'kpa'},{label:'1 atm =',val:14.6959,unit:'psi'},{label:'1 psi =',val:6.89476,unit:'kpa'}],
+            defaultFrom:'atm', defaultTo:'kpa'
+        },
+        energy: {
+            label: '能量',
+            icon: '⚡',
+            units: ['joule','kj','cal','kcal','wh','kwh','ev','btu'],
+            unitLabels: { joule:'焦耳 (J)', kj:'千焦 (kJ)', cal:'卡路里 (cal)', kcal:'千卡 (kcal)', wh:'瓦时 (Wh)', kwh:'千瓦时 (kWh)', ev:'电子伏特 (eV)', btu:'BTU (Btu)' },
+            toBase: { joule:1, kj:1000, cal:4.184, kcal:4184, wh:3600, kwh:3600000, ev:1.602176634e-19, btu:1055.06 },
+            quickRefs: [{label:'1 kWh =',val:3.6e6,unit:'joule'},{label:'1 kcal =',val:4.184,unit:'kj'},{label:'1 BTU =',val:1055.06,unit:'joule'},{label:'1 卡路里 =',val:4.184,unit:'joule'}],
+            defaultFrom:'kwh', defaultTo:'joule'
+        }
+    };
+
+    // ===== DOM REFS =====
+    const fromValue = document.getElementById('fromValue');
+    const fromUnit = document.getElementById('fromUnit');
+    const toValue = document.getElementById('toValue');
+    const toUnit = document.getElementById('toUnit');
+    const quickGrid = document.getElementById('quickGrid');
+    const catBtns = document.querySelectorAll('.cat-btn');
+    const toast = document.getElementById('copyToast');
+
+    let currentCat = 'length';
+
+    // ===== THEME =====
+    const themeToggle = document.getElementById('themeToggle');
+    function applyTheme(dark) {
+        if (dark) { document.documentElement.setAttribute('data-theme','dark'); themeToggle.textContent = '☀️'; }
+        else { document.documentElement.removeAttribute('data-theme'); themeToggle.textContent = '🌙'; }
+        localStorage.setItem('theme', dark ? 'dark' : 'light');
+    }
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark') applyTheme(true);
+    else if (saved === 'light') applyTheme(false);
+    else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) applyTheme(true);
+    themeToggle.addEventListener('click', () => { applyTheme(document.documentElement.getAttribute('data-theme') !== 'dark'); });
+
+    // ===== POPULATE UNITS =====
+    function populateUnits(cat) {
+        const data = categories[cat];
+        fromUnit.innerHTML = '';
+        toUnit.innerHTML = '';
+        data.units.forEach(u => {
+            const lbl = data.unitLabels[u] || u;
+            fromUnit.innerHTML += `<option value="${u}">${lbl}</option>`;
+            toUnit.innerHTML += `<option value="${u}">${lbl}</option>`;
+        });
+        fromUnit.value = data.defaultFrom || data.units[0];
+        toUnit.value = data.defaultTo || (data.units.length > 1 ? data.units[1] : data.units[0]);
+    }
+
+    // ===== CONVERT =====
+    function convert() {
+        const cat = currentCat;
+        const data = categories[cat];
+        const from = fromUnit.value;
+        const to = toUnit.value;
+        const raw = parseFloat(fromValue.value);
+
+        if (isNaN(raw)) { toValue.value = ''; updateQuickRefs(); return; }
+
+        let baseVal;
+        if (data.convert) {
+            baseVal = data.convert.toBase(raw, from);
+        } else {
+            baseVal = raw * (data.toBase[from] || 1);
+        }
+
+        let result;
+        if (data.convert) {
+            result = data.convert.fromBase(baseVal, to);
+        } else {
+            const baseUnit = data.toBase[to];
+            result = baseUnit ? baseVal / baseUnit : 0;
+        }
+
+        toValue.value = formatResult(result);
+        updateQuickRefs();
+    }
+
+    function formatResult(val) {
+        if (!isFinite(val)) return '—';
+        if (Math.abs(val) < 0.000001) return val.toExponential(6);
+        if (Math.abs(val) >= 1e12) return val.toExponential(4);
+        const precision = val < 0.001 ? 8 : val < 1 ? 6 : val < 100 ? 4 : val < 10000 ? 2 : 0;
+        return Number(val.toFixed(precision)).toString();
+    }
+
+    function swapUnits() {
+        const tmp = fromUnit.value;
+        fromUnit.value = toUnit.value;
+        toUnit.value = tmp;
+        convert();
+    }
+
+    // ===== QUICK REFERENCES =====
+    function updateQuickRefs() {
+        const data = categories[currentCat];
+        const from = fromUnit.value;
+        const raw = parseFloat(fromValue.value);
+        quickGrid.innerHTML = '';
+        const refs = data.quickRefs || [];
+        refs.forEach(ref => {
+            const div = document.createElement('div');
+            div.className = 'quick-item';
+            let val;
+            const targetUnit = ref.unit;
+            if (data.convert) {
+                // For temperature, calculate the specific reference
+                const tempMatch = ref.label.match(/^([-\d.]+)\s*°/);
+                const baseTemp = tempMatch ? parseFloat(tempMatch[1]) : 0;
+                if (ref.label.includes('°C')) {
+                    const inF = data.convert.fromBase(baseTemp, 'fahrenheit');
+                    val = inF;
+                } else if (ref.label.includes('°F')) {
+                    const inC = data.convert.toBase(baseTemp, 'fahrenheit');
+                    val = inC;
+                } else {
+                    val = ref.val;
+                }
+            } else {
+                const baseRef = ref.val * (data.toBase[ref.unit] ? 1 : 1);
+                if (targetUnit === from) {
+                    val = baseRef;
+                } else {
+                    const base = ref.val * (data.toBase[from] ? 1 : 1);
+                    val = data.toBase[targetUnit] ? base / data.toBase[targetUnit] : 0;
+                }
+            }
+            const unitLabel = data.unitLabels[targetUnit] || targetUnit;
+            div.innerHTML = `<span>${ref.label}</span><span class="val">${formatResult(val)} ${unitLabel.replace(/[^a-zA-Z°()/\s]/g,'').trim()}</span>`;
+            div.onclick = function() {
+                fromValue.value = ref.val;
+                const parts = ref.label.match(/(-?[\d.]+)/);
+                if (parts) fromValue.value = parts[1];
+                fromUnit.value = from;
+                toUnit.value = targetUnit;
+                convert();
+            };
+            quickGrid.appendChild(div);
+        });
+    }
+
+    // ===== CATEGORY SWITCH =====
+    function switchCat(cat) {
+        currentCat = cat;
+        catBtns.forEach(b => b.classList.toggle('active', b.dataset.cat === cat));
+        populateUnits(cat);
+        convert();
+    }
+
+    catBtns.forEach(btn => {
+        btn.addEventListener('click', () => switchCat(btn.dataset.cat));
+    });
+
+    // ===== KEYBOARD SHORTCUT =====
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.key === 'Enter') {
+            e.preventDefault();
+            fromValue.focus();
+        }
+    });
+
+    // ===== COPY TOAST =====
+    function showToast(msg) {
+        toast.textContent = msg;
+        toast.classList.add('show');
+        clearTimeout(toast._timer);
+        toast._timer = setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    // Click on result to copy
+    toValue.addEventListener('click', function() {
+        if (this.value) {
+            navigator.clipboard.writeText(this.value).then(() => showToast('✅ 已复制')).catch(() => {});
+        }
+    });
+
+    // ===== INIT =====
+    switchCat('length');
+})();
+</script>
+</body>
+</html>
