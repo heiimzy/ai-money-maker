@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线字数统计工具 - 免费字符计数、单词统计 | Word Counter</title>
+    <meta name="description" content="免费在线字数统计工具，支持中英文混排统计，实时计算字数、字符数、单词数、行数、段落数。无需注册，完全免费。适合写作者、学生、SEO优化人员使用。">
+    <meta name="keywords" content="字数统计,在线字数统计,字符统计,word counter,文字计数,中文字数统计,免费工具">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://your-tool-domain.com/word-counter/">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="在线字数统计工具 - 免费字符计数">
+    <meta property="og:description" content="免费在线字数统计工具，支持中英文混排统计，实时计算字数、字符数、单词数。">
+    <meta property="og:type" content="website">
+
+    <style>
+        :root {
+            --bg: #f5f7fa;
+            --bg-end: #c3cfe2;
+            --card-bg: #ffffff;
+            --text: #333;
+            --text-secondary: #666;
+            --border: #e8ecf1;
+            --primary: #667eea;
+            --primary-dark: #5a6fd6;
+            --stat-bg: #f8f9ff;
+            --stat-bg-end: #eef0ff;
+            --ad-bg: #f8f9fa;
+            --ad-border: #ddd;
+        }
+        [data-theme="dark"] {
+            --bg: #1a1a2e;
+            --bg-end: #16213e;
+            --card-bg: #2a2a4a;
+            --text: #e0e0e0;
+            --text-secondary: #aaa;
+            --border: #3a3a5a;
+            --primary: #7c8cff;
+            --primary-dark: #6b7bf0;
+            --stat-bg: #2a2a5a;
+            --stat-bg-end: #1e1e3e;
+            --ad-bg: #2a2a4a;
+            --ad-border: #4a4a6a;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, var(--bg) 0%, var(--bg-end) 100%);
+            min-height: 100vh;
+            color: var(--text);
+            transition: background 0.3s, color 0.3s;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            padding: 40px 0 20px;
+        }
+        header h1 {
+            font-size: 2rem;
+            background: linear-gradient(120deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        header p {
+            color: #666;
+            font-size: 1rem;
+        }
+        .tool-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            padding: 30px;
+            margin-bottom: 24px;
+        }
+        [data-theme="dark"] .tool-card {
+            background: var(--card-bg);
+        }
+        .theme-toggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 1000;
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            color: var(--text);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        textarea {
+            width: 100%;
+            height: 300px;
+            padding: 20px;
+            border: 2px solid #e8ecf1;
+            border-radius: 12px;
+            font-size: 16px;
+            line-height: 1.8;
+            resize: vertical;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+        .stat-item {
+            background: linear-gradient(135deg, var(--stat-bg), var(--stat-bg-end));
+            border-radius: 12px;
+            padding: 20px 16px;
+            text-align: center;
+        }
+        .stat-item .number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: block;
+        }
+        .stat-item .label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            display: block;
+        }
+        .stat-item.highlight {
+            background: linear-gradient(135deg, var(--primary), #764ba2);
+        }
+        .stat-item.highlight .number { color: white; }
+        .stat-item.highlight .label { color: rgba(255,255,255,0.8); }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary {
+            background: #f0f2f5;
+            color: var(--text);
+        }
+        .btn-secondary:hover { background: #e4e7ec; }
+        [data-theme="dark"] .btn-secondary {
+            background: #3a3a5a;
+            color: #e0e0e0;
+        }
+        [data-theme="dark"] .btn-secondary:hover { background: #4a4a6a; }
+
+        .ad-placeholder {
+            background: var(--ad-bg);
+            border: 2px dashed var(--ad-border);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin: 24px 0;
+        }
+        .ad-placeholder.top { margin-bottom: 24px; }
+
+        .seo-content {
+            margin-top: 40px;
+            padding: 30px 0;
+            border-top: 1px solid var(--border);
+        }
+        .seo-content h2 {
+            font-size: 1.4rem;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+        .seo-content p {
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+        .tools-nav {
+            margin-top: 30px;
+            padding: 24px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        .tools-nav h3 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            color: var(--text);
+        }
+        .tools-nav a {
+            display: inline-block;
+            margin: 4px 8px;
+            padding: 6px 14px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: opacity 0.2s;
+        }
+        .tools-nav a:hover { opacity: 0.85; }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            header h1 { font-size: 1.5rem; }
+            .tool-card { padding: 20px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="切换主题">🌙</button>
+    <div class="container">
+        <header>
+            <h1>📝 在线字数统计工具</h1>
+            <p>实时统计字数、字符数、单词数 — 完全免费，无需注册</p>
+        </header>
+
+        <!-- 广告位：顶部 -->
+        <div class="ad-placeholder top">
+            [ 广告位 - Google AdSense / 百度联盟 ]
+        </div>
+
+        <div class="tool-card">
+            <textarea id="textInput" placeholder="在此输入或粘贴文本，自动开始统计...&#10;&#10;支持中文、英文、标点符号统计。"></textarea>
+
+            <div class="stats-grid">
+                <div class="stat-item highlight">
+                    <span class="number" id="charCount">0</span>
+                    <span class="label">总字符数</span>
+                </div>
+                <div class="stat-item highlight">
+                    <span class="number" id="wordCount">0</span>
+                    <span class="label">总字数（含标点）</span>
+                </div>
+                <div class="stat-item">
+                    <span class="number" id="cnCharCount">0</span>
+                    <span class="label">中文字数</span>
+                </div>
+                <div class="stat-item">
+                    <span class="number" id="enWordCount">0</span>
+                    <span class="label">英文单词数</span>
+                </div>
+                <div class="stat-item">
+                    <span class="number" id="lineCount">0</span>
+                    <span class="label">行数</span>
+                </div>
+                <div class="stat-item">
+                    <span class="number" id="paraCount">0</span>
+                    <span class="label">段落数</span>
+                </div>
+                <div class="stat-item">
+                    <span class="number" id="spaceCount">0</span>
+                    <span class="label">空格数</span>
+                </div>
+                <div class="stat-item">
+                    <span class="number" id="punctCount">0</span>
+                    <span class="label">标点数</span>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-primary" onclick="clearText()">清空</button>
+                <button class="btn btn-secondary" onclick="copyResult()">复制统计结果</button>
+                <button class="btn btn-secondary" onclick="loadSample()">加载示例文本</button>
+            </div>
+        </div>
+
+        <!-- 广告位：中间 -->
+        <div class="ad-placeholder">
+            [ 广告位 - Google AdSense / 百度联盟 ]
+        </div>
+
+        <div class="seo-content">
+            <h2>什么是字数统计工具？</h2>
+            <p>字数统计工具是一款免费的在线文本分析工具，可以帮助您快速统计文本中的字符数、字数、单词数、段落数等信息。无论是写作、翻译、SEO优化还是学术论文，都可以使用本工具快速获取文本统计信息。</p>
+
+            <h2>为什么需要字数统计？</h2>
+            <p>在写作过程中，字数控制非常重要。论文有字数要求、社交媒体有字符限制、SEO文章需要特定长度。使用我们的在线字数统计工具，您可以实时了解文本的各项统计数据，轻松把控写作进度。</p>
+
+            <h2>主要功能特点</h2>
+            <p>✓ 实时统计：输入文本即可自动统计，无需刷新页面<br>
+            ✓ 全面数据：总字符数、中文字数、英文单词、行数、段落等<br>
+            ✓ 完全免费：无需注册，无需下载，即开即用<br>
+            ✓ 隐私保护：所有文本仅在本地浏览器处理，不会上传到服务器</p>
+        </div>
+
+        <!-- 广告位：底部 -->
+        <div class="ad-placeholder">
+            [ 广告位 - Google AdSense / 百度联盟 ]
+        </div>
+
+        <!-- 更多工具导航 -->
+        <div class="tools-nav">
+            <h3>🔧 更多免费在线工具</h3>
+            <a href="../json-formatter/">JSON 格式化工具</a>
+            <a href="../uuid-generator/">UUID/GUID 生成器</a>
+            <a href="../base64-encoder/">Base64 编码解码</a>
+        </div>
+
+        <footer>
+            <p>免费在线工具 | © 2026 字数统计工具 | 数据仅在本地处理，不会上传</p>
+        </footer>
+    </div>
+
+    <script>
+        const textInput = document.getElementById('textInput');
+
+        textInput.addEventListener('input', updateStats);
+
+        function updateStats() {
+            const text = textInput.value;
+            document.getElementById('charCount').textContent = text.length;
+            document.getElementById('wordCount').textContent = countWords(text);
+            document.getElementById('cnCharCount').textContent = countCN(text);
+            document.getElementById('enWordCount').textContent = countEN(text);
+            document.getElementById('lineCount').textContent = text ? text.split('\n').length : 0;
+            document.getElementById('paraCount').textContent = text ? text.split('\n\n').filter(p => p.trim()).length : 0;
+            document.getElementById('spaceCount').textContent = (text.match(/\s/g) || []).length;
+            document.getElementById('punctCount').textContent = (text.match(/[，。！？、；：""''（）【】《》—…·,\.!?;:\-\(\)\[\]{}]/g) || []).length;
+        }
+
+        function countWords(text) {
+            if (!text.trim()) return 0;
+            // For Chinese text, count each character as a word
+            const cn = (text.match(/[\u4e00-\u9fff]/g) || []).length;
+            // For English, count words
+            const en = (text.match(/[a-zA-Z]+/g) || []).length;
+            return cn + en;
+        }
+
+        function countCN(text) {
+            return (text.match(/[\u4e00-\u9fff]/g) || []).length;
+        }
+
+        function countEN(text) {
+            return (text.match(/[a-zA-Z]+/g) || []).length;
+        }
+
+        function clearText() {
+            textInput.value = '';
+            updateStats();
+        }
+
+        function copyResult() {
+            const text = textInput.value;
+            const stats = `字数统计结果：
+总字符数：${text.length}
+总字数（含标点）：${countWords(text)}
+中文字数：${countCN(text)}
+英文单词数：${countEN(text)}
+行数：${text.split('\n').length}
+段落数：${text.split('\n\n').filter(p => p.trim()).length}`;
+
+            navigator.clipboard.writeText(stats).then(() => {
+                alert('统计结果已复制到剪贴板！');
+            }).catch(() => {
+                alert('复制失败，请手动复制。');
+            });
+        }
+
+        function loadSample() {
+            textInput.value = `在互联网时代，写作已经成为一项必备技能。无论是学生写论文、职场人士写报告，还是自媒体创作者写文章，字数统计都是不可或缺的基本功能。
+
+Word counter is an essential tool for writers, editors, and students. It helps you keep track of your writing progress and ensure your content meets specific requirements.
+
+字数统计工具可以帮助您：
+1. 控制文章长度，满足平台要求
+2. 优化SEO内容，提升搜索排名
+3. 管理写作进度，提高工作效率
+
+Writing efficiently requires the right tools. A good word counter can make all the difference in your writing workflow.`;
+            updateStats();
+        }
+
+        // Auto-update on page load
+        updateStats();
+
+        // Theme toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const btn = document.querySelector('.theme-toggle');
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.removeAttribute('data-theme');
+                btn.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                btn.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+        // Restore theme
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.querySelector('.theme-toggle').textContent = '☀️';
+        }
+    </script>
+</body>
+</html>

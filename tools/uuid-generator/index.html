@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UUID/GUID 在线生成器 - 免费随机UUID v4生成工具 | 在线工具</title>
+    <meta name="description" content="免费在线 UUID/GUID 生成器，支持生成 UUID v4（随机）格式。可批量生成1-100个UUID，一键复制，支持大写/小写、有无连字符格式。开发者必备在线工具。">
+    <meta name="keywords" content="UUID生成器,GUID生成器,UUID v4,随机UUID,在线UUID工具,UUID生成,guid generator,uuid generator,免费工具">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://tools.example.com/uuid-generator/">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="UUID/GUID 在线生成器 - 免费随机UUID v4">
+    <meta property="og:description" content="免费在线 UUID/GUID 生成器，支持批量生成、多种格式，一键复制。开发者必备。">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="zh_CN">
+
+    <style>
+        :root {
+            --bg: #f0f2f5;
+            --bg-end: #d4d9e8;
+            --card-bg: #ffffff;
+            --text: #1a1a2e;
+            --text-secondary: #666;
+            --border: #e8ecf1;
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --stat-bg: #f0f9ff;
+            --stat-bg-end: #e0f2fe;
+            --ad-bg: #f8f9fa;
+            --ad-border: #ddd;
+        }
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --bg-end: #1e293b;
+            --card-bg: #1e293b;
+            --text: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --primary: #38bdf8;
+            --primary-dark: #0ea5e9;
+            --success: #34d399;
+            --warning: #fbbf24;
+            --stat-bg: #1e293b;
+            --stat-bg-end: #0f172a;
+            --ad-bg: #1e293b;
+            --ad-border: #475569;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, var(--bg) 0%, var(--bg-end) 100%);
+            min-height: 100vh;
+            color: var(--text);
+            transition: background 0.3s, color 0.3s;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            padding: 40px 0 20px;
+        }
+        header h1 {
+            font-size: 2rem;
+            background: linear-gradient(120deg, var(--primary), #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+        .theme-toggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 1000;
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            color: var(--text);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        .tool-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            padding: 30px;
+            margin-bottom: 24px;
+        }
+        .controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .controls label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .controls select, .controls input {
+            padding: 8px 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--card-bg);
+            color: var(--text);
+            transition: border-color 0.2s;
+        }
+        .controls select:focus, .controls input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .controls input[type="number"] {
+            width: 80px;
+        }
+        .uuid-list {
+            background: var(--stat-bg);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+        }
+        .uuid-item {
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 14px;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-radius: 4px;
+            user-select: all;
+        }
+        .uuid-item:last-child { border-bottom: none; }
+        .uuid-item:hover { background: rgba(14, 165, 233, 0.08); }
+        .uuid-item .copy-badge {
+            font-size: 11px;
+            color: var(--success);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        .uuid-item .copy-badge.show { opacity: 1; }
+        .uuid-count {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary {
+            background: #f0f2f5;
+            color: var(--text);
+        }
+        .btn-secondary:hover { background: #e4e7ec; }
+        [data-theme="dark"] .btn-secondary {
+            background: #334155;
+            color: #e2e8f0;
+        }
+        [data-theme="dark"] .btn-secondary:hover { background: #475569; }
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        .btn-success:hover { opacity: 0.9; }
+
+        .options-group {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+            align-items: center;
+        }
+        .options-group label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+        .options-group input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary);
+        }
+
+        .ad-placeholder {
+            background: var(--ad-bg);
+            border: 2px dashed var(--ad-border);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin: 24px 0;
+        }
+        .ad-placeholder.top { margin-bottom: 24px; }
+
+        .seo-content {
+            margin-top: 40px;
+            padding: 30px 0;
+            border-top: 1px solid var(--border);
+        }
+        .seo-content h2 {
+            font-size: 1.4rem;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+        .seo-content p {
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+        .seo-content ul {
+            margin: 12px 0 12px 20px;
+            color: var(--text-secondary);
+            line-height: 2;
+        }
+        .tools-nav {
+            margin-top: 30px;
+            padding: 24px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        .tools-nav h3 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            color: var(--text);
+        }
+        .tools-nav a {
+            display: inline-block;
+            margin: 4px 8px;
+            padding: 6px 14px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: opacity 0.2s;
+        }
+        .tools-nav a:hover { opacity: 0.85; }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            header h1 { font-size: 1.5rem; }
+            .tool-card { padding: 20px; }
+            .controls { flex-direction: column; align-items: stretch; }
+            .options-group { flex-direction: column; }
+            .uuid-item { font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="切换主题">🌙</button>
+    <div class="container">
+        <header>
+            <h1>🔑 UUID/GUID 在线生成器</h1>
+            <p>免费生成随机 UUID v4 — 批量生成、多种格式、一键复制</p>
+        </header>
+
+        <!-- 广告位：顶部 -->
+        <div class="ad-placeholder top">
+            [ 广告位 - Google AdSense / 百度联盟 ]
+        </div>
+
+        <div class="tool-card">
+            <div class="controls">
+                <label>
+                    生成数量：
+                    <input type="number" id="countInput" value="5" min="1" max="100" onchange="generateUUIDs()">
+                </label>
+                <button class="btn btn-primary" onclick="generateUUIDs()" id="generateBtn">🔄 生成 UUID</button>
+                <button class="btn btn-success" onclick="copyAllUUIDs()">📋 全部复制</button>
+                <button class="btn btn-secondary" onclick="clearUUIDs()">🗑️ 清空</button>
+            </div>
+
+            <div class="options-group">
+                <label>
+                    <input type="checkbox" id="uppercaseCheck" onchange="generateUUIDs()">
+                    大写
+                </label>
+                <label>
+                    <input type="checkbox" id="noHyphenCheck" onchange="generateUUIDs()">
+                    无连字符
+                </label>
+                <label>
+                    <span style="color:var(--text-secondary);font-size:14px;" id="generatedInfo"></span>
+                </label>
+            </div>
+
+            <div class="uuid-list" id="uuidList">
+                <div style="text-align:center;padding:40px;color:var(--text-secondary);">
+                    👆 点击「生成 UUID」开始，点击单个 UUID 可复制
+                </div>
+            </div>
+        </div>
+
+        <!-- 广告位：中间 -->
+        <div class="ad-placeholder">
+            [ 广告位 - Google AdSense / 百度联盟 ]
+        </div>
+
+        <div class="seo-content">
+            <h2>什么是 UUID/GUID？</h2>
+            <p>UUID（Universally Unique Identifier，通用唯一识别码）是一种标准的128位标识符，用于在分布式系统中唯一标识信息。GUID（Globally Unique Identifier）是微软对UUID标准的一个实现，两者在实际使用中基本可以互换。</p>
+
+            <h2>UUID 的版本</h2>
+            <p>本工具默认生成 <strong>UUID v4</strong>（随机生成），这是最常用的版本。其他常见版本包括：</p>
+            <ul>
+                <li><strong>UUID v1</strong> — 基于时间戳和MAC地址生成</li>
+                <li><strong>UUID v3</strong> — 基于MD5哈希和命名空间</li>
+                <li><strong>UUID v4</strong>（本工具）— 完全随机生成，安全性最高</li>
+                <li><strong>UUID v5</strong> — 基于SHA-1哈希和命名空间</li>
+            </ul>
+
+            <h2>UUID 的常见应用场景</h2>
+            <p><strong>数据库主键：</strong>分布式系统中使用自增ID容易产生冲突，UUID可以确保全局唯一性。许多现代数据库（PostgreSQL、MongoDB）对UUID有原生支持。</p>
+            <p><strong>API 资源标识：</strong>RESTful API中的资源ID通常使用UUID，避免暴露自增ID带来的信息泄露风险。</p>
+            <p><strong>会话标识：</strong>Web应用中的Session ID、CSRF Token等安全相关的标识符，使用UUID v4可以保证不可预测性。</p>
+            <p><strong>文件命名：</strong>上传文件时使用UUID重命名可以避免文件名冲突和路径遍历攻击。</p>
+
+            <h2>UUID 格式说明</h2>
+            <p>标准UUID格式为 <code>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</code>（8-4-4-4-12），共36个字符（含连字符）。本工具支持：</p>
+            <ul>
+                <li><strong>小写/大写</strong>：默认小写，可切换大写</li>
+                <li><strong>有无连字符</strong>：可选去掉连字符得到32位纯十六进制串</li>
+                <li><strong>批量生成</strong>：一次最多生成100个UUID</li>
+                <li><strong>逐一或全部复制</strong>：点击单个UUID或一键全部复制</li>
+            </ul>
+        </div>
+
+        <!-- 广告位：底部 -->
+        <div class="ad-placeholder">
+            [ 广告位 - Google AdSense / 百度联盟 ]
+        </div>
+
+        <!-- 更多工具导航 -->
+        <div class="tools-nav">
+            <h3>🔧 更多免费在线工具</h3>
+            <a href="../word-counter/">在线字数统计</a>
+            <a href="../json-formatter/">JSON 格式化工具</a>
+            <a href="../base64-encoder/">Base64 编码解码</a>
+        </div>
+
+        <footer>
+            <p>免费在线工具 | © 2026 UUID/GUID 生成器 | 所有数据在本地浏览器生成，不上传服务器</p>
+        </footer>
+    </div>
+
+    <script>
+        function generateUUID() {
+            // UUID v4 with crypto API
+            return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+            );
+        }
+
+        function generateUUIDs() {
+            const count = parseInt(document.getElementById('countInput').value) || 5;
+            const upper = document.getElementById('uppercaseCheck').checked;
+            const noHyphen = document.getElementById('noHyphenCheck').checked;
+            const list = document.getElementById('uuidList');
+
+            let uuids = [];
+            for (let i = 0; i < count; i++) {
+                let uuid = generateUUID();
+                if (noHyphen) uuid = uuid.replace(/-/g, '');
+                if (upper) uuid = uuid.toUpperCase();
+                uuids.push(uuid);
+            }
+
+            list.innerHTML = uuids.map((uuid, i) =>
+                `<div class="uuid-item" onclick="copySingle(this)" data-uuid="${uuid}">
+                    <span>${uuid}</span>
+                    <span class="copy-badge" id="badge-${i}">✅ 已复制</span>
+                </div>`
+            ).join('');
+
+            document.getElementById('generatedInfo').textContent =
+                `✅ 已生成 ${count} 个 UUID ${noHyphen ? '(无连字符) ' : ''}${upper ? '(大写)' : ''}`;
+        }
+
+        function copySingle(el) {
+            const uuid = el.getAttribute('data-uuid');
+            navigator.clipboard.writeText(uuid).then(() => {
+                const badge = el.querySelector('.copy-badge');
+                badge.classList.add('show');
+                setTimeout(() => badge.classList.remove('show'), 1500);
+            }).catch(() => {
+                // Fallback
+                const textArea = document.createElement('textarea');
+                textArea.value = uuid;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                const badge = el.querySelector('.copy-badge');
+                badge.classList.add('show');
+                setTimeout(() => badge.classList.remove('show'), 1500);
+            });
+        }
+
+        function copyAllUUIDs() {
+            const items = document.querySelectorAll('.uuid-item');
+            if (items.length === 0) return;
+            const text = Array.from(items).map(el => el.getAttribute('data-uuid')).join('\n');
+            navigator.clipboard.writeText(text).then(() => {
+                alert(`✅ 已复制 ${items.length} 个 UUID 到剪贴板！`);
+            }).catch(() => {
+                alert('复制失败，请手动选择复制。');
+            });
+        }
+
+        function clearUUIDs() {
+            document.getElementById('uuidList').innerHTML =
+                `<div style="text-align:center;padding:40px;color:var(--text-secondary);">
+                    👆 点击「生成 UUID」开始，点击单个 UUID 可复制
+                </div>`;
+            document.getElementById('generatedInfo').textContent = '';
+        }
+
+        // Theme toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const btn = document.querySelector('.theme-toggle');
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.removeAttribute('data-theme');
+                btn.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                btn.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.querySelector('.theme-toggle').textContent = '☀️';
+        }
+
+        // Keyboard shortcut: Ctrl+Enter to generate
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                generateUUIDs();
+            }
+        });
+
+        // Generate on load
+        window.addEventListener('DOMContentLoaded', generateUUIDs);
+    </script>
+</body>
+</html>

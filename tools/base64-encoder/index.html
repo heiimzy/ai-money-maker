@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base64 在线编码解码工具 - 免费Base64加密解密 | 在线工具</title>
+    <meta name="description" content="免费在线 Base64 编码解码工具。支持文本/图片的Base64编码和解码，支持标准Base64和URL安全Base64格式。开发者必备的在线Base64工具，无需注册，即开即用。">
+    <meta name="keywords" content="Base64编码,Base64解码,Base64在线工具,base64 encode,base64 decode,base64加密,base64解密,免费在线工具,开发者工具">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://tools.example.com/base64-encoder/">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Base64 在线编码解码工具 - 免费Base64加密解密">
+    <meta property="og:description" content="免费在线 Base64 编码解码工具。支持文本/图片的Base64编码和解码，开发者必备。">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="zh_CN">
+
+    <style>
+        :root {
+            --bg: #f0f2f5;
+            --bg-end: #d4d9e8;
+            --card-bg: #ffffff;
+            --text: #1a1a2e;
+            --text-secondary: #666;
+            --border: #e8ecf1;
+            --primary: #059669;
+            --primary-dark: #047857;
+            --primary-light: #34d399;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --ad-bg: #f8f9fa;
+            --ad-border: #ddd;
+            --code-bg: #f5f5f5;
+            --stat-bg: #ecfdf5;
+            --stat-bg-end: #d1fae5;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --bg-end: #1e293b;
+            --card-bg: #1e293b;
+            --text: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --primary: #34d399;
+            --primary-dark: #10b981;
+            --primary-light: #6ee7b7;
+            --success: #34d399;
+            --warning: #fbbf24;
+            --error: #f87171;
+            --ad-bg: #1e293b;
+            --ad-border: #475569;
+            --code-bg: #0f172a;
+            --stat-bg: #064e3b;
+            --stat-bg-end: #022c22;
+            --shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, var(--bg) 0%, var(--bg-end) 100%);
+            color: var(--text);
+            transition: background 0.3s, color 0.3s;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+
+        header {
+            background: linear-gradient(120deg, var(--primary), #3b82f6);
+            color: white; padding: 30px 0; text-align: center;
+        }
+        header h1 { font-size: 28px; }
+        header p { font-size: 16px; opacity: 0.9; margin-top: 6px; }
+
+        .theme-toggle {
+            position: fixed; top: 16px; right: 20px; z-index: 100;
+            background: rgba(255,255,255,0.2); border: none; color: white;
+            width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+            font-size: 20px; display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .tool-card {
+            background: var(--card-bg); border-radius: 16px;
+            box-shadow: var(--shadow); padding: 28px;
+            margin: -40px 0 30px; position: relative; z-index: 10;
+        }
+
+        .mode-selector {
+            display: flex; gap: 0; margin-bottom: 20px;
+            border-radius: 10px; overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .mode-btn {
+            flex: 1; padding: 10px 16px; border: none; cursor: pointer;
+            font-size: 14px; font-weight: 500;
+            background: var(--card-bg); color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+        .mode-btn.active {
+            background: var(--primary); color: white;
+        }
+        .mode-btn:not(.active):hover {
+            background: var(--stat-bg); color: var(--text);
+        }
+
+        .action-bar {
+            display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;
+        }
+        .action-bar button {
+            padding: 8px 18px; border: none; border-radius: 8px; cursor: pointer;
+            font-size: 14px; font-weight: 500; transition: all 0.2s;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-success { background: #10b981; color: white; }
+        .btn-success:hover { background: #059669; transform: translateY(-1px); }
+        .btn-ghost {
+            background: transparent; border: 1px solid var(--border) !important;
+            color: var(--text);
+        }
+        .btn-ghost:hover { background: var(--stat-bg); }
+
+        textarea {
+            width: 100%; min-height: 120px; padding: 14px;
+            border: 1px solid var(--border); border-radius: 10px;
+            background: var(--code-bg); color: var(--text);
+            font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+            font-size: 14px; resize: vertical;
+            transition: border-color 0.2s;
+        }
+        textarea:focus { outline: none; border-color: var(--primary); }
+
+        textarea#outputArea {
+            min-height: 100px; margin-top: 12px;
+            background: var(--card-bg); cursor: text;
+        }
+
+        .file-upload-area {
+            display: none; margin-top: 12px;
+            padding: 20px; border: 2px dashed var(--border);
+            border-radius: 10px; text-align: center; cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .file-upload-area:hover { border-color: var(--primary); }
+        .file-upload-area.has-file {
+            border-color: var(--success); background: var(--stat-bg);
+        }
+        .file-upload-area input { display: none; }
+        .file-upload-area .file-label {
+            color: var(--text-secondary); font-size: 14px; cursor: pointer;
+        }
+        .file-upload-area .file-label strong { color: var(--primary); }
+
+        .status-bar {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 14px; background: var(--code-bg);
+            border-radius: 8px; margin-top: 10px; font-size: 13px;
+        }
+        .status-indicator { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .status-valid { background: #10b981; }
+        .status-invalid { background: #ef4444; }
+        .status-idle { background: #9ca3af; }
+
+        .info-section {
+            background: var(--card-bg); border-radius: 12px;
+            padding: 24px; margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+        .info-section h3 {
+            font-size: 18px; margin-bottom: 12px; color: var(--primary);
+        }
+        .info-section h4 {
+            font-size: 15px; margin: 16px 0 8px; color: var(--text);
+        }
+        .info-section p, .info-section ul {
+            margin-bottom: 10px; color: var(--text-secondary);
+        }
+        .info-section ul { padding-left: 20px; }
+        .info-section li { margin-bottom: 4px; }
+        .info-section code {
+            background: var(--code-bg); padding: 2px 6px;
+            border-radius: 4px; font-size: 13px;
+        }
+
+        .ad-placeholder {
+            background: var(--ad-bg); border: 2px dashed var(--border);
+            padding: 30px; text-align: center; border-radius: 8px;
+            margin: 20px 0; color: var(--text-secondary); font-size: 14px;
+        }
+        .ad-placeholder::before { content: "📢 "; }
+
+        .tools-nav {
+            margin-top: 30px; padding: 24px;
+            background: var(--card-bg); border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        .tools-nav h3 {
+            font-size: 1.1rem; margin-bottom: 14px; color: var(--text);
+        }
+        .tools-nav a {
+            display: inline-block; margin: 4px 8px;
+            padding: 8px 18px; background: var(--primary);
+            color: white; text-decoration: none; border-radius: 8px;
+            font-size: 14px; font-weight: 500;
+            transition: opacity 0.2s, transform 0.15s;
+        }
+        .tools-nav a:hover { opacity: 0.85; transform: translateY(-1px); }
+
+        footer {
+            text-align: center; padding: 24px 0 40px;
+            color: var(--text-secondary); font-size: 13px;
+        }
+        footer a { color: var(--primary); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        .copy-toast {
+            position: fixed; bottom: 30px; left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--text); color: var(--bg);
+            padding: 10px 24px; border-radius: 10px; font-size: 14px;
+            opacity: 0; transition: all 0.3s;
+            pointer-events: none; z-index: 200;
+        }
+        .copy-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        .file-info {
+            margin-top: 8px; font-size: 13px; color: var(--text-secondary);
+        }
+
+        @media (max-width: 600px) {
+            header h1 { font-size: 22px; }
+            .tool-card { padding: 18px; margin-top: -30px; }
+            .action-bar { flex-direction: column; }
+            .action-bar button { width: 100%; justify-content: center; }
+            .mode-selector { flex-direction: column; }
+            .theme-toggle { top: 12px; right: 12px; width: 36px; height: 36px; font-size: 16px; }
+            textarea { min-height: 100px; }
+        }
+    </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle" aria-label="切换主题">🌙</button>
+
+<header>
+    <div class="container">
+        <h1>🔐 Base64 在线编码解码工具</h1>
+        <p>免费、快速、安全的 Base64 编码/解码，支持文本和文件</p>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- AD SLOT: top -->
+    <div class="ad-placeholder">广告位 - Google AdSense / 百度联盟 (预留)</div>
+
+    <!-- Tool Card -->
+    <div class="tool-card">
+        <div class="mode-selector">
+            <button class="mode-btn active" data-mode="encode" onclick="switchMode('encode')">✏️ 文本 → Base64</button>
+            <button class="mode-btn" data-mode="decode" onclick="switchMode('decode')">📖 Base64 → 文本</button>
+            <button class="mode-btn" data-mode="file" onclick="switchMode('file')">📁 文件 → Base64</button>
+        </div>
+
+        <div class="action-bar">
+            <button class="btn-primary" id="actionBtn">🔄 编码</button>
+            <button class="btn-ghost" id="sampleBtn">📋 加载示例</button>
+            <button class="btn-ghost" id="clearBtn">🗑️ 清空</button>
+            <button class="btn-success" id="copyBtn">📎 复制结果</button>
+        </div>
+
+        <textarea id="inputArea" placeholder="在此输入要编码/解码的文本..." spellcheck="false"></textarea>
+
+        <div class="file-upload-area" id="fileUploadArea">
+            <input type="file" id="fileInput" accept="image/*,.pdf,.txt,.json,.html,.css,.js,.xml,.zip,.gz">
+            <div class="file-label" onclick="document.getElementById('fileInput').click()">
+                📂 点击选择文件 或 <strong>拖拽文件到此处</strong><br>
+                <span style="font-size:12px;">支持图片、PDF、文本、JSON 等常见格式</span>
+            </div>
+            <div class="file-info" id="fileInfo"></div>
+        </div>
+
+        <textarea id="outputArea" placeholder="结果将显示在这里..." readonly spellcheck="false" onclick="copyResult()"></textarea>
+
+        <div class="status-bar">
+            <span class="status-indicator status-idle" id="statusIndicator"></span>
+            <span id="statusText">就绪 — 输入文本后点击「编码」或按 Ctrl+Enter</span>
+        </div>
+    </div>
+
+    <!-- AD SLOT: middle -->
+    <div class="ad-placeholder">广告位 - Google AdSense / 百度联盟 (预留)</div>
+
+    <!-- Info / SEO content -->
+    <div class="info-section">
+        <h3>💡 什么是 Base64 编码？</h3>
+        <p>Base64 是一种用 64 个可打印字符（A-Z、a-z、0-9、+、/）来表示二进制数据的编码方式。它将二进制数据转换为 ASCII 字符串，常用于在文本协议（如 HTTP、JSON、HTML）中传输二进制数据。</p>
+
+        <h4>🔄 编码 vs 解码</h4>
+        <p><strong>编码 (Encode)</strong>：将普通文本或二进制数据转换为 Base64 格式。<strong>解码 (Decode)</strong>：将 Base64 格式还原为原始文本或数据。</p>
+
+        <h4>🎯 常见使用场景</h4>
+        <ul>
+            <li><strong>数据 URL (Data URL)</strong>：在 HTML/CSS 中直接嵌入图片或字体</li>
+            <li><strong>JWT Token</strong>：JSON Web Token 使用 Base64 编码载荷</li>
+            <li><strong>API 传输</strong>：在 JSON/XML 中传输二进制数据</li>
+            <li><strong>邮件附件</strong>：MIME 协议使用 Base64 对附件编码</li>
+            <li><strong>认证信息</strong>：HTTP Basic Auth 使用 Base64 编码用户名和密码</li>
+        </ul>
+
+        <h4>⚠️ 注意事项</h4>
+        <p>Base64 <strong>不是加密算法</strong>，它只是数据格式的转换，没有密钥保护。不要用 Base64 来保护敏感信息。真正的安全需要 AES、RSA 等加密算法配合使用。</p>
+
+        <h3>🔗 更多免费在线工具</h3>
+        <ul>
+            <li><a href="../word-counter/" style="color:var(--primary);">在线字数统计工具</a> — 统计中英文字数、字符数</li>
+            <li><a href="../json-formatter/" style="color:var(--primary);">JSON 格式化校验工具</a> — 美化/压缩/验证 JSON</li>
+            <li><a href="../uuid-generator/" style="color:var(--primary);">UUID/GUID 生成器</a> — 随机 UUID v4 批量生成</li>
+        </ul>
+    </div>
+
+    <!-- AD SLOT: bottom -->
+    <div class="ad-placeholder">广告位 - Google AdSense / 百度联盟 (预留)</div>
+
+    <!-- Cross-link nav: styled pill buttons -->
+    <div class="tools-nav">
+        <h3>🔧 更多免费在线工具</h3>
+        <a href="../word-counter/">在线字数统计</a>
+        <a href="../json-formatter/">JSON 格式化工具</a>
+        <a href="../uuid-generator/">UUID/GUID 生成器</a>
+    </div>
+</div>
+
+<footer>
+    <p>免费在线工具集 · © 2026 · 所有数据仅在本地浏览器处理，不会上传到服务器</p>
+    <p style="margin-top:4px; font-size:12px;">
+        <a href="../word-counter/">字数统计</a> ·
+        <a href="../json-formatter/">JSON 格式化</a> ·
+        <a href="../uuid-generator/">UUID 生成器</a> ·
+        <a href="../base64-encoder/">Base64 编码解码</a>
+    </p>
+</footer>
+
+<div class="copy-toast" id="copyToast">✅ 已复制到剪贴板</div>
+
+<script>
+(function() {
+    // ========== Theme Toggle ==========
+    const themeToggle = document.getElementById('themeToggle');
+    function applyTheme(dark) {
+        if (dark) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            themeToggle.textContent = '☀️';
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            themeToggle.textContent = '🌙';
+        }
+        localStorage.setItem('theme', dark ? 'dark' : 'light');
+    }
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark') {
+        applyTheme(true);
+    } else if (saved === 'light') {
+        applyTheme(false);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        applyTheme(true);
+    }
+    themeToggle.addEventListener('click', () => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        applyTheme(!isDark);
+    });
+
+    // ========== DOM refs ==========
+    const inputArea = document.getElementById('inputArea');
+    const outputArea = document.getElementById('outputArea');
+    const actionBtn = document.getElementById('actionBtn');
+    const sampleBtn = document.getElementById('sampleBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const statusIndicator = document.getElementById('statusIndicator');
+    const statusText = document.getElementById('statusText');
+    const fileUploadArea = document.getElementById('fileUploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfo = document.getElementById('fileInfo');
+    const copyToast = document.getElementById('copyToast');
+
+    let currentMode = 'encode'; // 'encode' | 'decode' | 'file'
+    let fileData = null;
+
+    // ========== Mode Switching ==========
+    window.switchMode = function(mode) {
+        currentMode = mode;
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.mode === mode);
+        });
+
+        if (mode === 'file') {
+            fileUploadArea.style.display = 'block';
+            inputArea.style.display = 'none';
+            inputArea.value = '';
+            actionBtn.textContent = '🔄 编码文件';
+        } else {
+            fileUploadArea.style.display = 'none';
+            inputArea.style.display = 'block';
+            if (mode === 'encode') {
+                inputArea.placeholder = '在此输入要编码的文本...';
+                actionBtn.textContent = '🔄 编码';
+                sampleBtn.textContent = '📋 加载示例文本';
+            } else {
+                inputArea.placeholder = '在此输入 Base64 字符串...';
+                actionBtn.textContent = '🔄 解码';
+                sampleBtn.textContent = '📋 加载示例 Base64';
+            }
+        }
+        outputArea.value = '';
+        setStatus('idle', '就绪');
+        fileData = null;
+        fileInfo.textContent = '';
+        fileUploadArea.classList.remove('has-file');
+    };
+
+    // ========== Set Status ==========
+    function setStatus(type, msg) {
+        statusIndicator.className = 'status-indicator';
+        if (type === 'valid') {
+            statusIndicator.classList.add('status-valid');
+        } else if (type === 'invalid') {
+            statusIndicator.classList.add('status-invalid');
+        } else {
+            statusIndicator.classList.add('status-idle');
+        }
+        statusText.textContent = msg;
+    }
+
+    // ========== Show Toast ==========
+    function showToast(msg) {
+        copyToast.textContent = msg;
+        copyToast.classList.add('show');
+        setTimeout(() => copyToast.classList.remove('show'), 2000);
+    }
+
+    // ========== Copy via navigator.clipboard ==========
+    function copyText(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('✅ 已复制到剪贴板');
+        }).catch(() => {
+            // Fallback
+            outputArea.select();
+            document.execCommand('copy');
+            showToast('✅ 已复制');
+        });
+    }
+
+    // Click output to copy
+    window.copyResult = function() {
+        if (outputArea.value) {
+            copyText(outputArea.value);
+        }
+    };
+
+    // ========== Main Action ==========
+    function doAction() {
+        if (currentMode === 'encode') {
+            doEncode();
+        } else if (currentMode === 'decode') {
+            doDecode();
+        } else if (currentMode === 'file') {
+            doFileEncode();
+        }
+    }
+
+    function doEncode() {
+        const text = inputArea.value;
+        if (!text) {
+            setStatus('invalid', '⚠️ 请输入要编码的文本');
+            return;
+        }
+        try {
+            const encoded = btoa(unescape(encodeURIComponent(text)));
+            outputArea.value = encoded;
+            setStatus('valid', `✅ 编码成功! 原文本 ${text.length} 字符 → Base64 ${encoded.length} 字符`);
+        } catch (e) {
+            setStatus('invalid', '⚠️ 编码失败: ' + e.message);
+        }
+    }
+
+    function doDecode() {
+        const text = inputArea.value.trim();
+        if (!text) {
+            setStatus('invalid', '⚠️ 请输入要解码的 Base64 字符串');
+            return;
+        }
+        try {
+            const decoded = decodeURIComponent(escape(atob(text)));
+            outputArea.value = decoded;
+            setStatus('valid', `✅ 解码成功! Base64 ${text.length} 字符 → ${decoded.length} 字符`);
+        } catch (e) {
+            setStatus('invalid', '⚠️ 解码失败: 输入不是有效的 Base64 字符串。请检查输入格式。');
+        }
+    }
+
+    function doFileEncode() {
+        if (!fileData) {
+            setStatus('invalid', '⚠️ 请先选择要编码的文件');
+            return;
+        }
+        try {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64 = e.target.result.split(',')[1]; // Remove data:...;base64, prefix
+                outputArea.value = base64;
+                const sizeKB = (fileData.size / 1024).toFixed(1);
+                const base64Len = base64.length;
+                setStatus('valid', `✅ 编码成功! 文件 ${sizeKB}KB → Base64 ${base64Len} 字符`);
+            };
+            reader.onerror = function() {
+                setStatus('invalid', '⚠️ 文件读取失败');
+            };
+            reader.readAsDataURL(fileData);
+        } catch (e) {
+            setStatus('invalid', '⚠️ 编码失败: ' + e.message);
+        }
+    }
+
+    // ========== File Input ==========
+    fileInput.addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+            fileData = e.target.files[0];
+            const sizeKB = (fileData.size / 1024).toFixed(1);
+            fileInfo.textContent = `已选择: ${fileData.name} (${sizeKB}KB)`;
+            fileUploadArea.classList.add('has-file');
+            setStatus('idle', `已选择文件: ${fileData.name}，点击「编码文件」进行编码`);
+        }
+    });
+
+    // Drag and drop
+    fileUploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        fileUploadArea.style.borderColor = 'var(--primary)';
+    });
+    fileUploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        fileUploadArea.style.borderColor = '';
+    });
+    fileUploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        fileUploadArea.style.borderColor = '';
+        if (e.dataTransfer.files.length > 0) {
+            fileData = e.dataTransfer.files[0];
+            fileInput.files = e.dataTransfer.files;
+            const sizeKB = (fileData.size / 1024).toFixed(1);
+            fileInfo.textContent = `已选择: ${fileData.name} (${sizeKB}KB)`;
+            fileUploadArea.classList.add('has-file');
+            setStatus('idle', `已选择文件: ${fileData.name}，点击「编码文件」进行编码`);
+        }
+    });
+
+    // ========== Sample Data ==========
+    sampleBtn.addEventListener('click', function() {
+        if (currentMode === 'encode') {
+            inputArea.value = 'Hello, 世界! Base64 编码测试 🌍\n\n这是一段中文和英文混合的文本，用于测试 Base64 编码功能。\n\nSpecial chars: !@#$%^&*()_+-=[]{}|;:,.<>?/~`';
+            inputArea.focus();
+            setStatus('idle', '📋 已加载示例文本，点击「编码」进行编码');
+        } else if (currentMode === 'decode') {
+            inputArea.value = 'SGVsbG8sIOS4lueVjCEgQmFzZTY0IOe8lueggea1i+ivlSDwn4yNCg3ov5nmmK/kuIDmrrXkuK3mloflkojoi7HmlofmtY/op4jnm7TmloflkK7mlbTvvIznlKjkuo7mtY/op4ggQmFzZTY0IOe8lueggeWKn+iDveOAgg==';
+            inputArea.focus();
+            setStatus('idle', '📋 已加载示例 Base64，点击「解码」进行解码');
+        }
+    });
+
+    // ========== Clear ==========
+    clearBtn.addEventListener('click', function() {
+        inputArea.value = '';
+        outputArea.value = '';
+        setStatus('idle', '已清空');
+        if (currentMode === 'file') {
+            fileData = null;
+            fileInfo.textContent = '';
+            fileInput.value = '';
+            fileUploadArea.classList.remove('has-file');
+        }
+    });
+
+    // ========== Copy Result ==========
+    copyBtn.addEventListener('click', function() {
+        if (outputArea.value) {
+            copyText(outputArea.value);
+        } else {
+            showToast('⚠️ 没有可复制的内容');
+        }
+    });
+
+    // ========== Action Button ==========
+    actionBtn.addEventListener('click', doAction);
+
+    // ========== Ctrl+Enter ==========
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            e.preventDefault();
+            doAction();
+        }
+    });
+
+    // Auto-trigger on first load: show a demo
+    switchMode('encode');
+    inputArea.value = 'Hello, 世界! 试试 Base64 编码';
+    doEncode();
+
+})();
+</script>
+</body>
+</html>
